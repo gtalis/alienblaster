@@ -47,7 +47,7 @@ $(GAME_NAME): $(OBJECT_FILES)
 	@echo ""
 	@echo ""
 	@echo "Linking $@"
-	@$(COMPILER) $(GAME_LIBS) -o $(GAME_NAME) $(OBJECT_FILES)
+	@$(COMPILER) -o $(GAME_NAME) $(OBJECT_FILES) $(GAME_LIBS)
 	mv $(GAME_NAME) ../
 
 %.o: %.cc
