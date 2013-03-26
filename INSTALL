@@ -1,0 +1,11 @@
+1.1 download alienBlasterSrc-v100.zip or alienBlasterSrc-v100.tgz
+
+1.2 download alienBlasterGamedata-v100.zip or alienBlasterGamedata-v100.tgz
+
+2 Extract the archives
+
+3. make
+
+4. run ./alienBlaster
+
+5. have fun
