@@ -7,17 +7,23 @@ COMPILER=g++
 # include path
 INCLUDE_PATH=-I.
 
+INSTALL_DIR = install -d
+INSTALL_FILES = install -D
+
 #OPTIMIZATION=-g -pg -fprofile-arcs
 #OPTIMIZATION=-O3
 OPTIMIZATION=-g
 #OPTIMIZATION=
+DATADIR ?= "/usr/local/share/alienblaster"
 
 # SDL library
 SDL_LIBS=$(shell sdl-config --libs)
 SDL_FLAGS=$(shell sdl-config --cflags)
 
 # game flags
-GAME_FLAGS=-D_GNU_SOURCE -Wall -Winline -finline-functions $(SDL_FLAGS) $(OPTIMIZATION)
+GAME_FLAGS=-D_GNU_SOURCE -Wall -Winline -finline-functions $(SDL_FLAGS) \
+	 $(OPTIMIZATION) -DDATA_PREFIX='$(DATADIR)'
+
 GAME_LIBS=-lSDL_mixer $(SDL_LIBS) $(OPTIMIZATION)
 
 # all objectfiles
@@ -54,7 +60,7 @@ $(GAME_NAME): $(OBJECT_FILES)
 	@echo ""
 	@echo ""
 	@echo "Compiling $<"
-	@$(COMPILER) $(GAME_FLAGS) $(INCLUDE_PATH) -c $< -o $@ 
+	$(COMPILER) $(GAME_FLAGS) $(INCLUDE_PATH) -c $< -o $@ 
 
 depend:  dep
 
@@ -62,5 +68,22 @@ dep:
 	-touch Makefile.dep
 	-makedepend $(INCLUDE_PATH) -Y -f Makefile.dep *.cc 2> /dev/null
 	-rm -f Makefile.dep.bak
+
+install: all
+	@echo ""
+	@echo ""
+	@echo "Installing game's data..."
+	@$(INSTALL_DIR) $(DATADIR)
+	@$(INSTALL_DIR) $(DATADIR)/sound
+	@$(INSTALL_DIR) $(DATADIR)/images
+	@$(INSTALL_DIR) $(DATADIR)/cfg
+	@$(INSTALL_FILES) ../sound/* $(DATADIR)/sound/
+	@$(INSTALL_FILES) ../images/* $(DATADIR)/images/
+	@$(INSTALL_FILES) ../cfg/* $(DATADIR)/cfg/
+	@echo ""
+	@echo "Installing $(GAME_NAME)..."
+	@$(INSTALL_FILES) -m 755 ../$(GAME_NAME) /usr/local/games/$(GAME_NAME)
+	@echo "Done."
+
 
 -include Makefile.dep
