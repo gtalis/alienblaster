@@ -27,8 +27,9 @@ using namespace std;
 Explosion::Explosion(string fn, const Vector2D &position, 
 		     const Vector2D &velocity, const ExplosionTypes &explosionType) {
   sprite = surfaceDB.loadSurface(fn);
+  SDL_QueryTexture(sprite, NULL, NULL, &spriteR.w, &spriteR.h);
 
-  nrAnimStages = sprite->w / sprite->h;
+  nrAnimStages = spriteR.w / spriteR.h;
   expired = false;
 
   sndExplosion = mixer.loadSample( FN_SOUND_EXPLOSION_NORMAL );  
@@ -70,40 +71,42 @@ void Explosion::update( int dT ) {
   }
 }
 
-void Explosion::drawAirExplosion(SDL_Surface *screen) {
+void Explosion::drawAirExplosion(SDL_Renderer *screen) {
   if (expired) return;
   if ( ! ( explosionType == EXPLOSION_NORMAL_AIR ) ) return;
 
   SDL_Rect dest;
-  dest.x = lroundf(pos.getX()) - sprite->w / (2*nrAnimStages);
-  dest.y = lroundf(pos.getY()) - sprite->h / 2;
-  dest.w = sprite->w / nrAnimStages;
-  dest.h = sprite->h;
+  dest.x = lroundf(pos.getX()) - spriteR.w / (2*nrAnimStages);
+  dest.y = lroundf(pos.getY()) - spriteR.h / 2;
+  dest.w = spriteR.w / nrAnimStages;
+  dest.h = spriteR.h;
 
   SDL_Rect src;
-  src.x = actAnimStage * sprite->w / nrAnimStages;
+  src.x = actAnimStage * spriteR.w / nrAnimStages;
   src.y = 0;
-  src.w = sprite->w / nrAnimStages;
-  src.h = sprite->h;
+  src.w = spriteR.w / nrAnimStages;
+  src.h = spriteR.h;
 
-  SDL_BlitSurface( sprite, &src, screen, &dest );
+  //SDL_BlitSurface( sprite, &src, screen, &dest );
+  SDL_RenderCopy(screen, sprite, &src, &dest );
 }
 
-void Explosion::drawGroundExplosion(SDL_Surface *screen) {
+void Explosion::drawGroundExplosion(SDL_Renderer *screen) {
   if (expired) return;
   if ( ! ( explosionType == EXPLOSION_NORMAL_GROUND ) ) return;
 
   SDL_Rect dest;
-  dest.x = lroundf(pos.getX()) - sprite->w / (2*nrAnimStages);
-  dest.y = lroundf(pos.getY()) - sprite->h / 2;
-  dest.w = sprite->w / nrAnimStages;
-  dest.h = sprite->h;
+  dest.x = lroundf(pos.getX()) - spriteR.w / (2*nrAnimStages);
+  dest.y = lroundf(pos.getY()) - spriteR.h / 2;
+  dest.w = spriteR.w / nrAnimStages;
+  dest.h = spriteR.h;
 
   SDL_Rect src;
-  src.x = actAnimStage * sprite->w / nrAnimStages;
+  src.x = actAnimStage * spriteR.w / nrAnimStages;
   src.y = 0;
-  src.w = sprite->w / nrAnimStages;
-  src.h = sprite->h;
+  src.w = spriteR.w / nrAnimStages;
+  src.h = spriteR.h;
 
-  SDL_BlitSurface( sprite, &src, screen, &dest );
+  //SDL_BlitSurface( sprite, &src, screen, &dest );
+  SDL_RenderCopy(screen, sprite, &src, &dest );
 }

@@ -62,7 +62,7 @@ void Items::update( int dT ) {
   }
 }
 
-void Items::draw(SDL_Surface *screen) {
+void Items::draw(SDL_Renderer *screen) {
   vector<Item *>::iterator i;
   for (i = items.begin(); i != items.end(); ++i) {
     (*i)->draw(screen);

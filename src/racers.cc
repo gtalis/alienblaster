@@ -114,21 +114,21 @@ void Racers::rechargeShield( int dT ) {
   }
 }
 
-void Racers::drawRacers( SDL_Surface *screen ) {
+void Racers::drawRacers( SDL_Renderer *screen ) {
   vector<Racer *>::iterator i;
   for (i = racers.begin(); i != racers.end(); ++i) {
     (*i)->drawRacer(screen);
   }
 }
 
-void Racers::drawShadows( SDL_Surface *screen ) {
+void Racers::drawShadows( SDL_Renderer *screen ) {
   vector<Racer *>::iterator i;
   for (i = racers.begin(); i != racers.end(); ++i) {
     (*i)->drawShadow(screen);
   }
 }
 
-void Racers::drawStats( SDL_Surface *screen ) {
+void Racers::drawStats( SDL_Renderer *screen ) {
   vector<Racer *>::iterator i;
   for (i = racers.begin(); i != racers.end(); ++i) {
     (*i)->drawStats(screen);
@@ -184,7 +184,7 @@ void Racers::getKeyActionMaps() {
   playerKeys1 = settings->getPlayerKeys( 1 );
 }
 
-void Racers::handleEvent( const SDLKey key, const bool pressed ) {
+void Racers::handleEvent( const SDL_Keycode key, const bool pressed ) {
   PlayerEvent pEvent0 = playerKeys0[ key ];
   if ( pEvent0 != PE_UNKNOWN ) {
     handlePlayerEvent( pEvent0, 0, pressed );

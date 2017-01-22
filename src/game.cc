@@ -75,18 +75,28 @@ Game::Game() {
   videoserver = new Video();
   screen = 0;
   screen = videoserver->init();
+
+  surfaceDB.setRenderer( screen );
   settings = new Settings();
   intro = new Intro( screen );
   setDifficulty = new SetDifficulty( screen );
   menuArcadeMode = new MenuArcadeMode( screen );
-  
+
   pauseSprite = surfaceDB.loadSurface( FN_PAUSED );
+  SDL_QueryTexture( pauseSprite, 0, 0, &pauseSpriteR.w, &pauseSpriteR.h);
+  
   youLoseSprite = surfaceDB.loadSurface( FN_YOU_LOSE );
+  SDL_QueryTexture( youLoseSprite, 0, 0, &youLoseSpriteR.w, &youLoseSpriteR.h);  
+    
   youWinSprite = surfaceDB.loadSurface( FN_YOU_WIN );
+  SDL_QueryTexture( youWinSprite, 0, 0, &youLoseSpriteR.w, &youLoseSpriteR.h);
+    
   // for arcadeMode
   gameOverSprite = surfaceDB.loadSurface( FN_GAME_OVER );
+  SDL_QueryTexture( gameOverSprite, 0, 0, &gameOverSpriteR.w, &gameOverSpriteR.h);
 
   nukeEffectSurface = surfaceDB.loadSurface( FN_NUKE_EFFECT );
+  SDL_QueryTexture( nukeEffectSurface, 0, 0, &nukeEffectSurfaceR.w, &nukeEffectSurfaceR.h);
 
   bossAlarm = mixer.loadSample( FN_SOUND_BOSS_ALARM, 60 );
 
@@ -123,17 +133,23 @@ Game::Game() {
   sonic1 = new Sonic();
   sonic2 = new Sonic();
 
+  screen_w = SCREEN_WIDTH;
+  screen_h = SCREEN_HEIGHT;
+
   background = new Background();
   loadLevel( FN_LEVEL_ONE_PLAYER );
 
-  SDL_Surface *loadingSprite = surfaceDB.loadSurface( FN_LOADING );
+  SDL_Texture *loadingSprite = surfaceDB.loadSurface( FN_LOADING );
+  SDL_Rect loadingSpriteR;
+  SDL_QueryTexture( loadingSprite, 0, 0, &loadingSpriteR.w, &loadingSpriteR.h);
+  
   SDL_Rect dest;
-  dest.x = (SCREEN_WIDTH - loadingSprite->w ) / 2;
-  dest.y = (SCREEN_HEIGHT - loadingSprite->h ) / 2;
-  dest.w = loadingSprite->w;
-  dest.h = loadingSprite->h;
-  SDL_BlitSurface( loadingSprite, 0, screen, &dest );
-  SDL_Flip( screen );
+  dest.x = (SCREEN_WIDTH - loadingSpriteR.w ) / 2;
+  dest.y = (SCREEN_HEIGHT - loadingSpriteR.h ) / 2;
+  dest.w = loadingSpriteR.w;
+  dest.h = loadingSpriteR.h;
+  SDL_RenderCopy( screen, loadingSprite, 0, &dest );
+  SDL_RenderPresent( screen );
   initAllSurfaces();
 }
 
@@ -538,7 +554,7 @@ void Game::drawPlayOn() {
   else {
     if ( bossTime ) {
       enemys->drawBossStats(screen);
-      fontTime->drawStr( screen, (screen->w / 2), 5, "BOSS", FONT_ALIGN_CENTERED );
+      fontTime->drawStr( screen, (screen_w / 2), 5, "BOSS", FONT_ALIGN_CENTERED );
     }  
   }
 
@@ -552,7 +568,7 @@ void Game::drawPlayOn() {
   if ( !arcadeGame && !bossTime && !minibossTime ) drawTime();
   else {
     if ( bossTime || minibossTime ) {
-    fontTime->drawStr( screen, (screen->w / 2), 5, "BOSS", FONT_ALIGN_CENTERED );
+    fontTime->drawStr( screen, (screen_w / 2), 5, "BOSS", FONT_ALIGN_CENTERED );
     }
     else {
       drawPointsArcadeMode();
@@ -561,7 +577,8 @@ void Game::drawPlayOn() {
  
   if (paused) drawPaused();
   
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
    
   frameCnt++;
 }
@@ -581,7 +598,7 @@ void Game::drawTime() {
       digitCnt++;
       i *= 10;
     }
-    fontTime->drawInt(screen, (screen->w / 2) - (fontSizeTime * digitCnt) / 2, 5, 
+    fontTime->drawInt(screen, (screen_w / 2) - (fontSizeTime * digitCnt) / 2, 5, 
 		      timeToDraw, digitCnt, 0);
   }  
 }
@@ -597,7 +614,7 @@ void Game::drawPointsArcadeMode() {
     digitCnt++;
     i *= 10;
   }
-  fontTime->drawInt( screen, (screen->w / 2) - (fontSizeTime * digitCnt) / 2, 10, 
+  fontTime->drawInt( screen, (screen_w / 2) - (fontSizeTime * digitCnt) / 2, 10, 
 		     pointsToDraw, digitCnt, 0);
 }
   
@@ -605,11 +622,12 @@ void Game::drawPointsArcadeMode() {
 
 void Game::drawPaused() {
   SDL_Rect r;
-  r.x = screen->w/2 - pauseSprite->w/2;
-  r.y = screen->h/2 - pauseSprite->h/2;
-  r.w = pauseSprite->w;
-  r.h = pauseSprite->h;
-  SDL_BlitSurface( pauseSprite, 0, screen, &r );
+  r.x = screen_w/2 - pauseSpriteR.w/2;
+  r.y = screen_h/2 - pauseSpriteR.h/2;
+  r.w = pauseSpriteR.w;
+  r.h = pauseSpriteR.h;
+
+  SDL_RenderCopy( screen, pauseSprite, 0, &r );
 }
 
 
@@ -617,10 +635,10 @@ void Game::drawNukeEffect() {
   // effect-process: transparent -> nearly opaque -> transparent
   int timeFromMaximum = (NUKE_EFFECT_DURATION / 2) - (timeNukeEnd - SDL_GetTicks());
   timeFromMaximum = abs(timeFromMaximum);
-  SDL_SetAlpha( nukeEffectSurface, SDL_SRCALPHA | SDL_RLEACCEL,
+  SDL_SetTextureAlphaMod( nukeEffectSurface,
 		lroundf(((NUKE_EFFECT_DURATION / 2) - timeFromMaximum) * 128.0 / 
 			(NUKE_EFFECT_DURATION / 2)) );
-  SDL_BlitSurface( nukeEffectSurface, 0, screen, 0 );
+  SDL_RenderCopy( screen, nukeEffectSurface, 0, 0 );
 
   int randRange = (int)
     (( ((NUKE_EFFECT_DURATION / 2.0) - timeFromMaximum) * NUKE_QUAKE_EFFECT /
@@ -634,28 +652,29 @@ void Game::drawNukeEffect() {
   SDL_Rect src, dest;
   if ( randX < 0 ) {
     src.x = -randX;    
-    src.w = screen->w + randX;
+    src.w = screen_w + randX;
     dest.x = 0;
-    dest.w = screen->w + randX;
+    dest.w = screen_w + randX;
   } else {
     src.x = 0;
-    src.w = screen->w - randX;
+    src.w = screen_w - randX;
     dest.x = randX;
-    dest.w = screen->w - randX;
+    dest.w = screen_w - randX;
   }
   if ( randY < 0 ) {
     src.y = -randY;    
-    src.h = screen->h + randY;
+    src.h = screen_h + randY;
     dest.y = 0;
-    dest.h = screen->h + randY;
+    dest.h = screen_h + randY;
   } else {
     src.y = 0;
-    src.h = screen->h - randY;
+    src.h = screen_h - randY;
     dest.y = randY;
-    dest.h = screen->h - randY;
+    dest.h = screen_h - randY;
   }
 
-  SDL_BlitSurface( screen, &src, screen, &dest );
+    printf("TODO: drawNukeEffect\n");
+  //SDL_RenderCopy( screen, screen, &src, & dest);
 }
 
 
@@ -686,7 +705,8 @@ void Game::options() {}
 
 void Game::roundFinished() {
   drawRoundFinished();
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
   while (gameState == GS_ROUNDFINISHED ) {
     handleEventsRoundFinished();
   }
@@ -735,16 +755,16 @@ void Game::drawRoundFinished() {
   SDL_Rect r;
 
   if ( arcadeGame ) {
-    r.x = screen->w/2 - gameOverSprite->w / 2;
-    r.y = screen->h/2 - gameOverSprite->h / 2;
-    r.w = gameOverSprite->w;
-    r.h = gameOverSprite->h;
-    SDL_BlitSurface( gameOverSprite, 0, screen, &r );
+    r.x = screen_w/2 - gameOverSpriteR.w / 2;
+    r.y = screen_h/2 - gameOverSpriteR.h / 2;
+    r.w = gameOverSpriteR.w;
+    r.h = gameOverSpriteR.h;
+    SDL_RenderCopy( screen, gameOverSprite, 0, &r);
 
-    fontTime->drawStr( screen, screen->w/2, screen->h/2 + gameOverSprite->h/2 + 50, 
+    fontTime->drawStr( screen, screen_w/2, screen_h/2 + gameOverSpriteR.h/2 + 50, 
 		       "SCORE: " + asString( racers->getPointsArcadeMode() ),
 		       FONT_ALIGN_CENTERED );
-    fontTime->drawStr( screen, screen->w/2, screen->h/2 + gameOverSprite->h/2 + 100, 
+    fontTime->drawStr( screen, screen_w/2, screen_h/2 + gameOverSpriteR.h/2 + 100, 
 		       "Kill Rate: " + asString(enemys->getNrEnemysKilled()) 
 		       + "/" + asString(enemys->getNrEnemysGenerated()),
 		       FONT_ALIGN_CENTERED );
@@ -753,18 +773,18 @@ void Game::drawRoundFinished() {
   // normal game
   else {
     if ( racers->bothPlayersLost() ) {
-      r.x = screen->w/2 - youLoseSprite->w / 2;
-      r.y = screen->h/2 - youLoseSprite->h / 2;
-      r.w = youLoseSprite->w;
-      r.h = youLoseSprite->h;
-      SDL_BlitSurface( youLoseSprite, 0, screen, &r );
+      r.x = screen_w/2 - youLoseSpriteR.w / 2;
+      r.y = screen_h/2 - youLoseSpriteR.h / 2;
+      r.w = youLoseSpriteR.w;
+      r.h = youLoseSpriteR.h;
+      SDL_RenderCopy( screen, youLoseSprite, 0, &r);
     } else {
-      r.x = screen->w/2 - youWinSprite->w / 2;
-      r.y = screen->h/2 - youWinSprite->h / 2;
-      r.w = youWinSprite->w;
-      r.h = youWinSprite->h;
-      SDL_BlitSurface( youWinSprite, 0, screen, &r );
-      fontTime->drawStr(screen, screen->w/2, screen->h/2 + youWinSprite->h/2 + 50, 
+      r.x = screen_w/2 - youWinSpriteR.w / 2;
+      r.y = screen_h/2 - youWinSpriteR.h / 2;
+      r.w = youWinSpriteR.w;
+      r.h = youWinSpriteR.h;
+      SDL_RenderCopy( screen, youWinSprite, 0, &r);
+      fontTime->drawStr(screen, screen_w/2, screen_h/2 + youWinSpriteR.h/2 + 50, 
 			"Kill Rate: " + asString(enemys->getNrEnemysKilled()) 
 			+ ":" + asString(enemys->getNrEnemysGenerated()),
 			FONT_ALIGN_CENTERED);
@@ -891,7 +911,8 @@ void Game::drawBossKilled() {
   explosions->drawAirExplosions(screen);
   if ( bossNukeEffect ) drawNukeEffect();
   racers->drawStats(screen);
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
 }
 
 void Game::updateBossKilled() {

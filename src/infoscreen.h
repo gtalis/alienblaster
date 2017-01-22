@@ -66,12 +66,18 @@ const int NR_INFOSCREEN_CHOICES = 15;
 
 class Infoscreen {
   private:
-  SDL_Surface *screen;
-  SDL_Surface *activeChoiceSprite;
-  SDL_Surface *lightFighterIcon1;
-  SDL_Surface *lightFighterIcon2;
-  SDL_Surface *heavyFighterIcon1;
-  SDL_Surface *heavyFighterIcon2;
+  SDL_Renderer *screen;
+  SDL_Texture *activeChoiceSprite;
+  SDL_Rect activeChoiceSpriteR;
+  SDL_Texture *lightFighterIcon1;
+  SDL_Rect lightFighterIcon1R;
+  SDL_Texture *lightFighterIcon2;
+  SDL_Rect lightFighterIcon2R;
+  SDL_Texture *heavyFighterIcon1;
+  SDL_Rect heavyFighterIcon1R;
+  SDL_Texture *heavyFighterIcon2;
+  SDL_Rect heavyFighterIcon2R;
+  
   Font *font;
   Font *fontHighlighted;
   Item *newItem;
@@ -83,14 +89,14 @@ class Infoscreen {
   int choose, confirm;
 
   public:
-  Infoscreen( SDL_Surface *scr );
+  Infoscreen( SDL_Renderer *scr );
   ~Infoscreen();
   void run();
 
   private:
   void handleEvents();
   void draw();
-  void putBitmapAtPosition( int x, int y, SDL_Surface* bitmap );
+  void putBitmapAtPosition( int x, int y, SDL_Texture* bitmap );
 };
 
 #endif

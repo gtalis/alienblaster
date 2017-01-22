@@ -26,7 +26,7 @@
 #include <string>
 #include <map>
 
-typedef std::map<std::string, SDL_Surface *, std::greater<std::string> > StringSurfaceMap;
+typedef std::map<std::string, SDL_Texture *, std::greater<std::string> > StringTextureMap;
 
 
 class SurfaceDB;
@@ -47,13 +47,16 @@ class SurfaceDB {
 	     Uint8 transparentB=255 );
   ~SurfaceDB();
 
-  SDL_Surface *loadSurface( std::string fn, bool alpha=false );
+
+  void setRenderer(SDL_Renderer *renderer);
+  SDL_Texture *loadSurface( std::string fn, bool alpha=false );
 
   private:
-  StringSurfaceMap surfaceDB;
+  StringTextureMap surfaceDB;
   Uint8 transR, transG, transB;
+  SDL_Renderer *mRenderer;
 
-  SDL_Surface *getSurface( std::string fn );
+  SDL_Texture *getSurface( std::string fn );
 };
 
 

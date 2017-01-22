@@ -64,7 +64,7 @@ const bool pressed(const SDL_Event& event) {
   return false;
 }
 
-void debugEvent(const SDL_Event& event, const SDLKey code) {
+void debugEvent(const SDL_Event& event, const SDL_Keycode code) {
     if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
     printf("Joystick button%d event: %s (%d)\n",
       event.jbutton.button, (pressed(event)) ? "pressed" : "released", code);
@@ -74,21 +74,21 @@ void debugEvent(const SDL_Event& event, const SDLKey code) {
   }
 }
 
-const SDLKey translateEvent(const SDL_Event& event) {
+const SDL_Keycode translateEvent(const SDL_Event& event) {
   if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
     return event.key.keysym.sym;
   }
   if (event.type == SDL_JOYAXISMOTION) {
-    return (SDLKey) (1024 + event.jaxis.axis * 2 + ((event.jaxis.value > 0) ? 1 : 0));
+    return (SDL_Keycode) (1024 + event.jaxis.axis * 2 + ((event.jaxis.value > 0) ? 1 : 0));
   }
   if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
-    return (SDLKey) (1040 + event.jbutton.button);
+    return (SDL_Keycode) (1040 + event.jbutton.button);
   }
-  return (SDLKey) 0;
+  return (SDL_Keycode) 0;
 }
 #endif
 
-const SDLKey Input::translate(const SDL_Event& event) {
+const SDL_Keycode Input::translate(const SDL_Event& event) {
 #ifdef DEBUG
   debugEvent(event, translateEvent(event));
 #endif
@@ -96,12 +96,12 @@ const SDLKey Input::translate(const SDL_Event& event) {
     return event.key.keysym.sym;
   }    
   if (event.type == SDL_JOYAXISMOTION) {
-    return (SDLKey) (1024 + event.jaxis.axis * 2 + ((event.jaxis.value > 0) ? 1 : 0));
+    return (SDL_Keycode) (1024 + event.jaxis.axis * 2 + ((event.jaxis.value > 0) ? 1 : 0));
   }
   if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
-    return (SDLKey) (1040 + event.jbutton.button);
+    return (SDL_Keycode) (1040 + event.jbutton.button);
   }    
-  return (SDLKey) 0;
+  return (SDL_Keycode) 0;
 }    
 
 const bool Input::isPressed(const SDL_Event& event) {

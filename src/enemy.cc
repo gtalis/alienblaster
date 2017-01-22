@@ -43,10 +43,13 @@ Enemy::Enemy( Vector2D pos, Vector2D vel, EnemyTypes whichEnemyType,
   enemyType = whichEnemyType;
   hitpoints = ENEMY_HITPOINTS[ enemyType ];
 
+  spriteEnemy = 0;
+  spriteShadow = 0;
+
   this->pos = pos;
   this->vel = vel;
   relTargetPos = Vector2D(0,0);
-  
+
   switch ( enemyType ) {
   case FIGHTER: 
     {
@@ -124,10 +127,16 @@ Enemy::Enemy( Vector2D pos, Vector2D vel, EnemyTypes whichEnemyType,
     }
   }
 
-  boundingBox = new BoundingBox( lroundf(pos.getX() - spriteEnemy->w * 0.45),
-				 lroundf(pos.getY() - spriteEnemy->h * 0.45),
-				 lroundf(spriteEnemy->w * 0.9),
-				 lroundf(spriteEnemy->h * 0.9) );
+  SDL_QueryTexture(spriteEnemy, NULL, NULL, &spriteEnemyR.w, &spriteEnemyR.h);
+
+  if (spriteShadow) {
+    SDL_QueryTexture(spriteShadow, NULL, NULL, &spriteShadowR.w, &spriteShadowR.h);
+  }
+
+  boundingBox = new BoundingBox( lroundf(pos.getX() - spriteEnemyR.w * 0.45),
+				 lroundf(pos.getY() - spriteEnemyR.h * 0.45),
+				 lroundf(spriteEnemyR.w * 0.9),
+				 lroundf(spriteEnemyR.h * 0.9) );
   nextShotPrimary = rand() % (ENEMY_RAND_WAIT_PRIMARY[ enemyType ]+1);
   nextShotSecondary = rand() % (ENEMY_RAND_WAIT_SECONDARY[ enemyType ]+1);
 
@@ -154,7 +163,7 @@ void Enemy::expire() {
 }
 
 Circle Enemy::getBoundingCircle() {
-  return Circle( pos, min(spriteEnemy->w / 2, spriteEnemy->h / 2) );
+  return Circle( pos, min(spriteEnemyR.w / 2, spriteEnemyR.h / 2) );
 }
 
 BoundingBox *Enemy::getBoundingBox() {
@@ -174,11 +183,11 @@ bool Enemy::collidesWith( const Circle &circle ) {
 }
 
 bool Enemy::collidesWithAsCircle( const Circle &circle ) {
-  return ( circle.getRadius() + spriteEnemy->w / 2 > circle.getCenter().distanceTo( pos ) );
+  return ( circle.getRadius() + spriteEnemyR.w / 2 > circle.getCenter().distanceTo( pos ) );
 }
 
 bool Enemy::collidesWithAsCircle( BoundingBox *box ) {
-  return ( box->overlaps( Circle( pos, min( spriteEnemy->h / 2, spriteEnemy->w / 2 ) ) ) );
+  return ( box->overlaps( Circle( pos, min( spriteEnemyR.h / 2, spriteEnemyR.w / 2 ) ) ) );
 }
 
 
@@ -230,7 +239,7 @@ void Enemy::move( int dT ) {
   }    
   case BOSS_2: {
     if ( boss2PointReached ) {
-      boss2TargetPos = Vector2D( (rand() % (SCREEN_WIDTH - spriteEnemy->w)) + spriteEnemy->w / 2, rand() % 100 + spriteEnemy->h );
+      boss2TargetPos = Vector2D( (rand() % (SCREEN_WIDTH - spriteEnemyR.w)) + spriteEnemyR.w / 2, rand() % 100 + spriteEnemyR.h );
       boss2PointReached = false;
     } else {
       pos += (boss2TargetPos - pos) / 50;
@@ -244,8 +253,8 @@ void Enemy::move( int dT ) {
 }
 
 void Enemy::updateBoundingBox() {
-  boundingBox->moveUpperBound( lroundf(pos.getY() - spriteEnemy->h * 0.45) );
-  boundingBox->moveLeftBound( lroundf(pos.getX() - spriteEnemy->w * 0.45) );
+  boundingBox->moveUpperBound( lroundf(pos.getY() - spriteEnemyR.h * 0.45) );
+  boundingBox->moveLeftBound( lroundf(pos.getX() - spriteEnemyR.w * 0.45) );
 }
 
 
@@ -255,7 +264,7 @@ void Enemy::firePrimary() {
     {
       Shot *shot = 
 	new Shot( ENEMY_SHOT_NORMAL, 666, 
-		  pos + Vector2D( 0, spriteEnemy->h / 2 ),
+		  pos + Vector2D( 0, spriteEnemyR.h / 2 ),
 		  90 );
       shots->addShot( shot );
       mixer.playSample( sndShotPrimary, 0 );
@@ -265,12 +274,12 @@ void Enemy::firePrimary() {
     {
       Shot *shot = 
 	new Shot( ENEMY_SHOT_NORMAL, 666,
-		  pos + Vector2D( -7, spriteEnemy->h / 2 ),
+		  pos + Vector2D( -7, spriteEnemyR.h / 2 ),
 		  100 );
       shots->addShot( shot );
       shot = 
 	new Shot( ENEMY_SHOT_NORMAL, 666,
-		  pos + Vector2D( +7, spriteEnemy->h / 2 ),
+		  pos + Vector2D( +7, spriteEnemyR.h / 2 ),
 		  80 );
       shots->addShot( shot );
       mixer.playSample( sndShotPrimary, 0 );
@@ -460,7 +469,7 @@ void Enemy::doDamage( ShotTypes shotType, int fromWhichPlayer ) {
       for(int i = 0; i < 10; i++){
         newExplosion = new Explosion(
           FN_EXPLOSION_ENEMY,
-          pos + Vector2D(rand() % spriteEnemy->w - spriteEnemy->w / 2, rand() % spriteEnemy->h - spriteEnemy->h / 2),
+          pos + Vector2D(rand() % spriteEnemyR.w - spriteEnemyR.w / 2, rand() % spriteEnemyR.h - spriteEnemyR.h / 2),
           vel + Vector2D(rand() % 100 - 50, rand() % 100 - 50) / 5.0,
           EXPLOSION_NORMAL_GROUND );
         explosions->addExplosion( newExplosion );
@@ -474,64 +483,68 @@ void Enemy::doDamage( ShotTypes shotType, int fromWhichPlayer ) {
 }
 
 
-void Enemy::drawGroundEnemy( SDL_Surface *screen ) {
+void Enemy::drawGroundEnemy( SDL_Renderer *screen ) {
   if ( ENEMY_FLYING[ enemyType ] ) return;
 
   SDL_Rect destR;
 
-  destR.x = lroundf(pos.getX()) - spriteEnemy->w / 2;
-  destR.y = lroundf(pos.getY()) - spriteEnemy->h / 2;
-  destR.w = spriteEnemy->w;
-  destR.h = spriteEnemy->h;
+  destR.x = lroundf(pos.getX()) - spriteEnemyR.w / 2;
+  destR.y = lroundf(pos.getY()) - spriteEnemyR.h / 2;
+  destR.w = spriteEnemyR.w;
+  destR.h = spriteEnemyR.h;
 
-  SDL_BlitSurface( spriteEnemy, 0, screen, &destR );
+  //SDL_BlitSurface( spriteEnemy, 0, screen, &destR );
+  SDL_RenderCopy(screen, spriteEnemy, 0, &destR );
 }
 
-void Enemy::drawAirEnemy( SDL_Surface *screen ) {
+void Enemy::drawAirEnemy( SDL_Renderer *screen ) {
   if ( !ENEMY_FLYING[ enemyType ] ) return;
 
   SDL_Rect destR;
 
-  destR.x = lroundf(pos.getX()) - spriteEnemy->w / 2;
-  destR.y = lroundf(pos.getY()) - spriteEnemy->h / 2;
-  destR.w = spriteEnemy->w;
-  destR.h = spriteEnemy->h;
+  destR.x = lroundf(pos.getX()) - spriteEnemyR.w / 2;
+  destR.y = lroundf(pos.getY()) - spriteEnemyR.h / 2;
+  destR.w = spriteEnemyR.w;
+  destR.h = spriteEnemyR.h;
 
-  SDL_BlitSurface( spriteEnemy, 0, screen, &destR );
+  //SDL_BlitSurface( spriteEnemy, 0, screen, &destR );
+  SDL_RenderCopy(screen, spriteEnemy, 0, &destR );
 }
 
-void Enemy::drawShadow( SDL_Surface *screen ) {
+void Enemy::drawShadow( SDL_Renderer *screen ) {
   if ( !ENEMY_FLYING[ enemyType ] ) return;
 
   SDL_Rect destR;
 
-  destR.x = lroundf(pos.getX()) - spriteShadow->w / 2 - ENEMY_FLYING_HEIGHT[ enemyType ];
-  destR.y = lroundf(pos.getY()) - spriteShadow->h / 2 + ENEMY_FLYING_HEIGHT[ enemyType ];
-  destR.w = spriteShadow->w;
-  destR.h = spriteShadow->h;
+  destR.x = lroundf(pos.getX()) - spriteShadowR.w / 2 - ENEMY_FLYING_HEIGHT[ enemyType ];
+  destR.y = lroundf(pos.getY()) - spriteShadowR.h / 2 + ENEMY_FLYING_HEIGHT[ enemyType ];
+  destR.w = spriteShadowR.w;
+  destR.h = spriteShadowR.h;
 
-  SDL_BlitSurface( spriteShadow, 0, screen, &destR );
+  //SDL_BlitSurface( spriteShadow, 0, screen, &destR );
+  SDL_RenderCopy(screen, spriteShadow, 0, &destR );
 }
 
 
-void Enemy::drawStats( SDL_Surface *screen ) {
+void Enemy::drawStats( SDL_Renderer *screen ) {
   // draw status of the bosses
-  float pixPerHP = spriteEnemy->w / (float)(ENEMY_HITPOINTS[ enemyType ]);
+  float pixPerHP = spriteEnemyR.w / (float)(ENEMY_HITPOINTS[ enemyType ]);
   SDL_Rect destR;
   // draw damage
-  destR.x = lroundf(pos.getX()) - spriteEnemy->w / 2;
-  destR.y = lroundf(pos.getY()) - spriteEnemy->h / 2 - 4;
+  destR.x = lroundf(pos.getX()) - spriteEnemyR.w / 2;
+  destR.y = lroundf(pos.getY()) - spriteEnemyR.h / 2 - 4;
   float damageToDraw = min( (float)ENEMY_HITPOINTS[ enemyType ] / 2, hitpoints );
   destR.w = lroundf(pixPerHP * damageToDraw);
   destR.h = 3;
-  SDL_FillRect( screen, &destR, SDL_MapRGB(screen->format, 255, 0, 0) );
+  printf("drawStats -> SDL_FillRect");
+  //SDL_FillRect( screen, &destR, SDL_MapRGB(screen->format, 255, 0, 0) );
   // draw shields
   destR.x = lroundf(pos.getX());
-  destR.y = lroundf(pos.getY()) - spriteEnemy->h / 2 - 4;
+  destR.y = lroundf(pos.getY()) - spriteEnemyR.h / 2 - 4;
   float shieldToDraw = min( (float)ENEMY_HITPOINTS[ enemyType ] / 2, 
 			    hitpoints - ENEMY_HITPOINTS[ enemyType ] / 2 );
   if ( shieldToDraw < 1 ) destR.w = 0;
   else destR.w = lroundf(pixPerHP * shieldToDraw);
   destR.h = 3;
-  SDL_FillRect(screen, &destR, SDL_MapRGB(screen->format, 0, 255, 0) );
+  //SDL_FillRect(screen, &destR, SDL_MapRGB(screen->format, 0, 255, 0) );
 }

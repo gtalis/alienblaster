@@ -35,7 +35,7 @@ class Wrecks {
   void addWreck(Wreck *wreck);
   void expireWrecks();
   void updateWrecks( int dT );
-  void draw(SDL_Surface *screen);
+  void draw(SDL_Renderer *screen);
   void deleteAllWrecks();
   
   unsigned int getNrWrecks() { return wrecks.size(); }

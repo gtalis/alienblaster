@@ -37,7 +37,7 @@ public:
   ~Input();
   void getJoystick();
   void freeJoystick();
-  const SDLKey translate(const SDL_Event& event);
+  const SDL_Keycode translate(const SDL_Event& event);
   const bool isPressed(const SDL_Event& event);
 
   static const Input input();

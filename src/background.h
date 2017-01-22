@@ -23,7 +23,8 @@
 #include <vector>
 #include <string>
 
-class SDL_Surface;
+class SDL_Texture;
+class SDL_Renderer;
 
 class Background {
   public:
@@ -32,8 +33,8 @@ class Background {
   void clearTileList();
   void addTile( std::string tilename );
   void generateBackground( int length );
-  void draw( SDL_Surface* screen );
-  void draw( SDL_Surface* screen, int step );
+  void draw( SDL_Renderer* screen );
+  void draw( SDL_Renderer* screen, int step );
 
   private:
   
@@ -44,7 +45,7 @@ class Background {
   int step;
 
   std::vector< std::string > tileNames;
-  std::vector< SDL_Surface* > tileSurfaces;
+  std::vector< SDL_Texture* > tileSurfaces;
 };
 
 

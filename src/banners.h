@@ -39,7 +39,7 @@ class Banners {
   void expireBanners();
   void deleteAllBanners();
   void update( int dT );
-  void draw(SDL_Surface *screen);
+  void draw(SDL_Renderer *screen);
 };
 
 

@@ -29,6 +29,7 @@ using namespace std;
 
 Sonic::Sonic() {
   sonicBall = surfaceDB.loadSurface( FN_SONIC_EFFECT, true );
+  SDL_QueryTexture(sonicBall, NULL, NULL, &sonicBallR.w, &sonicBallR.h);
   timeStage = 0;
   active = false;
   waveLength = 6.0f;
@@ -40,18 +41,18 @@ void Sonic::setPos( Vector2D pos1, Vector2D pos2 ) {
   active = true;
 }
 
-void Sonic::drawAtPos( SDL_Surface *screen, Vector2D pos1, Vector2D pos2 ) {
+void Sonic::drawAtPos( SDL_Renderer *screen, Vector2D pos1, Vector2D pos2 ) {
   setPos( pos1, pos2 );
   draw( screen );
 }
 
-void Sonic::draw( SDL_Surface *screen ) {
+void Sonic::draw( SDL_Renderer *screen ) {
   if ( !active ) return;
   timeStage += 2;
   timeStage = (timeStage % (int)(waveLength + 0.5f)) + 1;
   SDL_Rect rect;
-  rect.w = sonicBall->w;
-  rect.h = sonicBall->h;
+  rect.w = sonicBallR.w;
+  rect.h = sonicBallR.h;
   Vector2D sonicIncrement = pos2 - pos1;
   float dist = sonicIncrement.getLength() - waveLength;
   sonicIncrement.setLength((float) timeStage);
@@ -62,8 +63,9 @@ void Sonic::draw( SDL_Surface *screen ) {
   while (dist >= 5) {
     sonicActual += sonicIncrement;
     dist -= waveLength;
-    rect.x = (int) sonicActual.getX() - sonicBall->w / 2;
-    rect.y = (int) sonicActual.getY() - sonicBall->h / 2;
-    SDL_BlitSurface( sonicBall, 0, screen, &rect );
+    rect.x = (int) sonicActual.getX() - sonicBallR.w / 2;
+    rect.y = (int) sonicActual.getY() - sonicBallR.h / 2;
+    //SDL_BlitSurface( sonicBall, 0, screen, &rect );
+    SDL_RenderCopy(screen, sonicBall, 0, &rect );
   }
 }

@@ -318,6 +318,7 @@ int getRandValue( const int *choicesWeights, int nrChoices, int sumWeights ) {
 
 void initAllSurfaces() {
   string datadir = DATA_PREFIX;
+  datadir = ".";
   cout << "Datadir is : " << datadir.c_str() << endl;
   surfaceDB.loadSurface(datadir + "/images/fighter.bmp" );
   surfaceDB.loadSurface(datadir + "/images/fighterShadow.bmp", true);

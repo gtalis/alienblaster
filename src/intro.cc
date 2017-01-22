@@ -28,10 +28,14 @@ using namespace std;
 #include "settings.h"
 #include "infoscreen.h"
 
-Intro::Intro( SDL_Surface *scr ) {
+Intro::Intro( SDL_Renderer *scr ) {
   screen = scr;
   introSprite = surfaceDB.loadSurface( FN_ALIENBLASTER_INTRO );
+  SDL_QueryTexture( introSprite, NULL, NULL,  &introSpriteR.w, &introSpriteR.h);
+
   activeChoiceSprite = surfaceDB.loadSurface( FN_INTRO_SHOW_CHOICE );
+  SDL_QueryTexture( activeChoiceSprite, NULL, NULL,  &activeChoiceSpriteR.w, &activeChoiceSpriteR.h);
+
   font = new Font( FN_FONT_INTRO );
   fontHighlighted = new Font( FN_FONT_INTRO_HIGHLIGHTED );
   activeChoice = 0;
@@ -59,25 +63,28 @@ void Intro::run( GameStates &gameState ) {
 void Intro::draw() {
   videoserver->clearScreen();
   SDL_Rect r;
-  r.x = screen->w / 2 - introSprite->w / 2;
+  r.x = SCREEN_WIDTH / 2 - introSpriteR.w / 2;
   r.y = 0;
-  r.w = introSprite->w;
-  r.h = introSprite->h;  
-  SDL_BlitSurface( introSprite, 0, screen, &r );
+  r.w = introSpriteR.w;
+  r.h = introSpriteR.h;  
+  //SDL_BlitSurface( introSprite, 0, screen, &r );
+  SDL_RenderCopy(screen, introSprite, 0, &r );
 
   for ( int i = 0; i < NR_INTRO_CHOICES; i++ ) {
     if ( activeChoice == i ) {
-      r.x = 230 - activeChoiceSprite->w - 8;
+      r.x = 230 - activeChoiceSpriteR.w - 8;
       r.y = 258 + i * 35;
-      r.w = activeChoiceSprite->w;
-      r.h = activeChoiceSprite->h;
-      SDL_BlitSurface(activeChoiceSprite, 0, screen, &r );
+      r.w = activeChoiceSpriteR.w;
+      r.h = activeChoiceSpriteR.h;
+      //SDL_BlitSurface(activeChoiceSprite, 0, screen, &r );
+      SDL_RenderCopy(screen, activeChoiceSprite, 0, &r );
       fontHighlighted->drawStr( screen, 230, 260 + i * 35, INTRO_CHOICES[ i ] );
     } else {
       font->drawStr( screen, 230, 260 + i * 35, INTRO_CHOICES[ i ] );
     }
   }
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
 }
 
 void Intro::handleEvents( GameStates &gameState ) {
@@ -184,8 +191,10 @@ void Intro::showScreenshots() {
   SDL_Surface *surf8 = SDL_LoadBMP( FN_SCREENSHOT8.c_str() );
   SDL_Surface *surf9 = SDL_LoadBMP( FN_SCREENSHOT9.c_str() );
 
-  SDL_BlitSurface( surfS, 0, screen, 0 );
-  SDL_Flip(screen);
+  //SDL_BlitSurface( surfS, 0, screen, 0 );
+  SDL_RenderCopy(screen, SDL_CreateTextureFromSurface(screen, surfS), 0, 0);
+  //SDL_Flip(screen);
+  SDL_RenderPresent( screen );
   SDL_Delay(3000);
   int sps = 50; // steps per second
   if (blendImages( screen, surfS, 0, surf0, 0, sps )) 
@@ -200,7 +209,7 @@ void Intro::showScreenshots() {
 		  blendImages( screen, surf8, 0, surf9, 0, sps );
 }
 
-bool Intro::blendImages( SDL_Surface *screen, SDL_Surface *surf0, SDL_Rect *r1, SDL_Surface *surf1, SDL_Rect *r2, int sps ) {
+bool Intro::blendImages( SDL_Renderer *screen, SDL_Surface *surf0, SDL_Rect *r1, SDL_Surface *surf1, SDL_Rect *r2, int sps ) {
   SDL_Event event;
   
   int i = 0;
@@ -208,11 +217,16 @@ bool Intro::blendImages( SDL_Surface *screen, SDL_Surface *surf0, SDL_Rect *r1, 
   while (i < 255) {
     if (i>255) i=255;
     
-    SDL_SetAlpha( surf0, SDL_SRCALPHA, 255-i );
-    SDL_SetAlpha( surf1, SDL_SRCALPHA, i );
-    SDL_BlitSurface( surf0, 0, screen, r1 );
-    SDL_BlitSurface( surf1, 0, screen, r2 );
-    SDL_Flip( screen );
+    //SDL_SetAlpha( surf0, SDL_SRCALPHA, 255-i );
+    SDL_SetSurfaceAlphaMod(surf0, 255-i );
+    //SDL_SetAlpha( surf1, SDL_SRCALPHA, i );
+    SDL_SetSurfaceAlphaMod(surf1, i);
+    //SDL_BlitSurface( surf0, 0, screen, r1 );
+    SDL_RenderCopy(screen, SDL_CreateTextureFromSurface(screen, surf0), 0, r1);
+    //SDL_BlitSurface( surf1, 0, screen, r2 );
+    SDL_RenderCopy(screen, SDL_CreateTextureFromSurface(screen, surf1), 0, r2);
+    //SDL_Flip( screen );
+    SDL_RenderPresent( screen );
     int t2 = SDL_GetTicks();
     int dt= SDL_GetTicks() - t;
     t = t2;

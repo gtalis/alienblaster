@@ -32,15 +32,19 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 
-MenuArcadeMode::MenuArcadeMode( SDL_Surface *scr ) {
+MenuArcadeMode::MenuArcadeMode( SDL_Renderer *scr ) {
   screen = scr;
   arcadeSprite = surfaceDB.loadSurface( FN_ARCADE_LOGO );
+  SDL_QueryTexture(arcadeSprite, NULL, NULL, &arcadeSpriteR.w, &arcadeSpriteR.h);
   activeChoiceSprite = surfaceDB.loadSurface( FN_INTRO_SHOW_CHOICE );
+  SDL_QueryTexture(activeChoiceSprite, NULL, NULL, &activeChoiceSpriteR.w, &activeChoiceSpriteR.h);
 
   font = new Font( FN_FONT_INTRO );
   fontHighlighted = new Font( FN_FONT_INTRO_HIGHLIGHTED );
   lightFighterIcon1 = surfaceDB.loadSurface( FN_LIGHT_FIGHTER_1_ICON );
+  SDL_QueryTexture(lightFighterIcon1, NULL, NULL, &lightFighterIcon1R.w, &lightFighterIcon1R.h);
   heavyFighterIcon1 = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_1_ICON );
+  SDL_QueryTexture(heavyFighterIcon1, NULL, NULL, &heavyFighterIcon1R.w, &heavyFighterIcon1R.h);
   choose = mixer.loadSample( FN_SOUND_ARCADE_CHOOSE, 100 );
   confirm = mixer.loadSample( FN_SOUND_ARCADE_CONFIRM, 60 );
   activeChoice = 0;
@@ -105,11 +109,12 @@ bool MenuArcadeMode::getPlayerOneLightFighter() {
 void MenuArcadeMode::draw() {
   videoserver->clearScreen();
   SDL_Rect r;
-  r.x = screen->w / 2 - arcadeSprite->w / 2;
+  r.x = SCREEN_WIDTH / 2 - arcadeSpriteR.w / 2;
   r.y = 0;
-  r.w = arcadeSprite->w;
-  r.h = arcadeSprite->h;  
-  SDL_BlitSurface( arcadeSprite, 0, screen, &r );
+  r.w = arcadeSpriteR.w;
+  r.h = arcadeSpriteR.h;  
+  //SDL_BlitSurface( arcadeSprite, 0, screen, &r );
+  SDL_RenderCopy(screen, arcadeSprite, 0, &r );
 
   string name = "UNKNOWN";
   int points = 0;
@@ -125,11 +130,12 @@ void MenuArcadeMode::draw() {
 
   for ( int i = 0; i < NR_MENU_ARCADE_CHOICES; i++ ) {
     if ( activeChoice == i ) {
-      r.x = 230 - activeChoiceSprite->w - 8;
+      r.x = 230 - activeChoiceSpriteR.w - 8;
       r.y = 338 + i * 40;
-      r.w = activeChoiceSprite->w;
-      r.h = activeChoiceSprite->h;
-      SDL_BlitSurface( activeChoiceSprite, 0, screen, &r );
+      r.w = activeChoiceSpriteR.w;
+      r.h = activeChoiceSpriteR.h;
+      //SDL_BlitSurface( activeChoiceSprite, 0, screen, &r );
+      SDL_RenderCopy(screen, activeChoiceSprite, 0, &r );
       fontHighlighted->drawStr( screen, 230, 340 + i * 40, STRINGS_MENU_ARCADE_CHOICES[ i ] );
     } else {
       font->drawStr( screen, 230, 340 + i * 40, STRINGS_MENU_ARCADE_CHOICES[ i ] );
@@ -138,22 +144,25 @@ void MenuArcadeMode::draw() {
   
   font->drawStr( screen, 50, 270, "Player 1" );
   if ( playerOneLightFighter ) {
-    r.x = 100 - lightFighterIcon1->w / 2;
-    r.y = 340 - lightFighterIcon1->h / 2;
-    r.w = lightFighterIcon1->w;
-    r.h = lightFighterIcon1->h;
-    SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+    r.x = 100 - lightFighterIcon1R.w / 2;
+    r.y = 340 - lightFighterIcon1R.h / 2;
+    r.w = lightFighterIcon1R.w;
+    r.h = lightFighterIcon1R.h;
+    //SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+    SDL_RenderCopy(screen, lightFighterIcon1, 0, &r );
   } else {
-    r.x = 100 - heavyFighterIcon1->w / 2;
-    r.y = 340 - heavyFighterIcon1->h / 2;
-    r.w = heavyFighterIcon1->w;
-    r.h = heavyFighterIcon1->h;
-    SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+    r.x = 100 - heavyFighterIcon1R.w / 2;
+    r.y = 340 - heavyFighterIcon1R.h / 2;
+    r.w = heavyFighterIcon1R.w;
+    r.h = heavyFighterIcon1R.h;
+    //SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+    SDL_RenderCopy(screen, heavyFighterIcon1, 0, &r );
   }
   fontHighlighted->drawStr( screen, 100, 400, "Press \"1\"", FONT_ALIGN_CENTERED );
   fontHighlighted->drawStr( screen, 100, 430, "To Change", FONT_ALIGN_CENTERED );
 
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
 }
 
 
@@ -265,11 +274,12 @@ void MenuArcadeMode::updateHighScore( int points ) {
 void MenuArcadeMode::readHighScoreName( int pos ) {
   videoserver->clearScreen();
   SDL_Rect r;
-  r.x = screen->w / 2 - arcadeSprite->w / 2;
+  r.x = SCREEN_WIDTH / 2 - arcadeSpriteR.w / 2;
   r.y = 0;
-  r.w = arcadeSprite->w;
-  r.h = arcadeSprite->h;  
-  SDL_BlitSurface( arcadeSprite, 0, screen, &r );
+  r.w = arcadeSpriteR.w;
+  r.h = arcadeSpriteR.h;  
+  //SDL_BlitSurface( arcadeSprite, 0, screen, &r );
+  SDL_RenderCopy(screen, arcadeSprite, 0, &r );
   
   string name = "UNKNOWN";
   int points = 0;
@@ -291,7 +301,8 @@ void MenuArcadeMode::readHighScoreName( int pos ) {
   string newName = "";
   while ( handleEventsReadName( newName ) ) {
     drawReadName( newName );
-    SDL_Flip( screen );
+    //SDL_Flip( screen );
+    SDL_RenderPresent( screen );
     SDL_Delay( 50 );
   }
   op->setStr( newName, "NAME_" + asString( pos ) );
@@ -360,7 +371,8 @@ void MenuArcadeMode::drawReadName( string &name ) {
   r.y = 380;
   r.w = 400;
   r.h = 40;
-  SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 0) );
+  printf("menuArcadeMode -> drawReadName");
+  //SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 0) );
 
   fontHighlighted->drawStr( screen, 320, 380, name, FONT_ALIGN_CENTERED );
 }

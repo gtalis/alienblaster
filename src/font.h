@@ -58,7 +58,8 @@ const int FONT_MONOSPACE       = (1<<3);
 
 class Font {
   private:
-  SDL_Surface *sprite;
+  SDL_Texture *sprite;
+  SDL_Rect spriteR;
   int charWidth;
   int charHeight;
   std::string charset;
@@ -70,8 +71,8 @@ class Font {
   void setCharWidth(int width);
   int getCharWidth();
   int getCharHeight();
-  void drawInt(SDL_Surface *screen, int posx, int posy, int val, int alignDigitCnt, int flags = 0);
-  void drawStr(SDL_Surface *screen, int posx, int posy, const std::string &text, int flags = 0);
+  void drawInt(SDL_Renderer *screen, int posx, int posy, int val, int alignDigitCnt, int flags = 0);
+  void drawStr(SDL_Renderer *screen, int posx, int posy, const std::string &text, int flags = 0);
 };
 
 #endif

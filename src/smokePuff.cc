@@ -32,8 +32,10 @@ SmokePuff::SmokePuff( Vector2D position, Vector2D velocity, SmokePuffTypes which
   sprite = surfaceDB.loadSurface( FN_SMOKE_PUFF[ smokePuffType ],
 				  SMOKE_PUFF_ALPHA_BLENDING );
 
+  SDL_QueryTexture( sprite, NULL, NULL, &spriteR.w, &spriteR.h);
+
   expired = false;
-  nrAnimStages = sprite->w / sprite->h;
+  nrAnimStages = spriteR.w / spriteR.h;
   timePerStage = LIFETIME_SMOKE_PUFF[ smokePuffType ] / nrAnimStages;
   actAnimStage = 0;
   timeLived = 0;
@@ -52,20 +54,21 @@ void SmokePuff::update( int dT ) {
   }
 }
 
-void SmokePuff::drawSmokePuff( SDL_Surface *screen ) {
+void SmokePuff::drawSmokePuff( SDL_Renderer *screen ) {
   if (expired) return;
 
   SDL_Rect dest;
-  dest.x = lroundf(pos.getX()) - sprite->w / (2*nrAnimStages);
-  dest.y = lroundf(pos.getY()) - sprite->h / 2;
-  dest.w = sprite->w / nrAnimStages;
-  dest.h = sprite->h;
+  dest.x = lroundf(pos.getX()) - spriteR.w / (2*nrAnimStages);
+  dest.y = lroundf(pos.getY()) - spriteR.h / 2;
+  dest.w = spriteR.w / nrAnimStages;
+  dest.h = spriteR.h;
 
   SDL_Rect src;
-  src.x = actAnimStage * sprite->w / nrAnimStages;
+  src.x = actAnimStage * spriteR.w / nrAnimStages;
   src.y = 0;
-  src.w = sprite->w / nrAnimStages;
-  src.h = sprite->h;
+  src.w = spriteR.w / nrAnimStages;
+  src.h = spriteR.h;
 
-  SDL_BlitSurface( sprite, &src, screen, &dest );
+  //SDL_BlitSurface( sprite, &src, screen, &dest );
+  SDL_RenderCopy(screen, sprite, &src, &dest );
 }

@@ -45,10 +45,10 @@ class Shots {
   void moveAndCollide( int dT );
 
   // draw the shots
-  void drawShadows(SDL_Surface *screen);
-  void drawAirShots(SDL_Surface *screen);
-  void drawGroundShots(SDL_Surface *screen);
-  void drawGroundAirShots(SDL_Surface *screen);
+  void drawShadows(SDL_Renderer *screen);
+  void drawAirShots(SDL_Renderer *screen);
+  void drawGroundShots(SDL_Renderer *screen);
+  void drawGroundAirShots(SDL_Renderer *screen);
   
   Shot* getNearestRocket(Vector2D position);
   bool existsRocket();

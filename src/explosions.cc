@@ -38,14 +38,14 @@ void Explosions::addExplosion(Explosion *explosion) {
   }
 }
 
-void Explosions::drawAirExplosions(SDL_Surface *screen) {
+void Explosions::drawAirExplosions(SDL_Renderer *screen) {
   vector<Explosion *>::iterator i;
   for (i = explosions.begin(); i != explosions.end(); ++i) {
     (*i)->drawAirExplosion(screen);
   }
 }
 
-void Explosions::drawGroundExplosions(SDL_Surface *screen) {
+void Explosions::drawGroundExplosions(SDL_Renderer *screen) {
   vector<Explosion *>::iterator i;
   for (i = explosions.begin(); i != explosions.end(); ++i) {
     (*i)->drawGroundExplosion(screen);

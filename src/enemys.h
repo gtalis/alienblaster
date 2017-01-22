@@ -67,11 +67,11 @@ class Enemys {
   void doNukeDamage();
   
   // draws the enemys.
-  void drawGroundEnemys( SDL_Surface *screen );
-  void drawAirEnemys( SDL_Surface *screen );
-  void drawShadows( SDL_Surface *screen );
-  void drawBossStats( SDL_Surface *screen );
-  void drawAllStats( SDL_Surface *screen );
+  void drawGroundEnemys( SDL_Renderer *screen );
+  void drawAirEnemys( SDL_Renderer *screen );
+  void drawShadows( SDL_Renderer *screen );
+  void drawBossStats( SDL_Renderer *screen );
+  void drawAllStats( SDL_Renderer *screen );
 };
 
 #endif

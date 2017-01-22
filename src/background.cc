@@ -50,20 +50,22 @@ void Background::generateBackground( int length ) {
   tileSurfaces.clear();
   minTileWidth   = 9999999;
   minTileHeight  = 9999999;
-  
+
   // load all tiles
-  vector< SDL_Surface* > tmpTiles;
+  vector< SDL_Texture* > tmpTiles;
   for(int i=tileNames.size()-1; i>=0; i--) {
 
-    SDL_Surface *tile = surfaceDB.loadSurface( tileNames[i] );
+    SDL_Texture *tile = surfaceDB.loadSurface( tileNames[i] );
+    SDL_Rect tileR;
+    SDL_QueryTexture(tile, NULL, NULL, &tileR.w, &tileR.h);
 
     if (tile != NULL) {
       tmpTiles.push_back( tile );
-      if (tile->w < minTileWidth) {
-	minTileWidth = tile->w;
+      if (tileR.w < minTileWidth) {
+	minTileWidth = tileR.w;
       } 
-      if (tile->h < minTileHeight) {
-	minTileHeight = tile->h;
+      if (tileR.h < minTileHeight) {
+	minTileHeight = tileR.h;
       }
     } 
   }
@@ -92,13 +94,13 @@ void Background::generateBackground( int length ) {
 }
 
 
-void Background::draw( SDL_Surface* screen ) {  
+void Background::draw( SDL_Renderer* screen ) {  
   step = (step+1) % (tilesPerColumn*minTileHeight);
   draw( screen, step );
 }
 
 
-void Background::draw( SDL_Surface* screen, int step ) {
+void Background::draw( SDL_Renderer* screen, int step ) {
   if (step < 0) {
     step *= -1;
   }
@@ -132,7 +134,12 @@ void Background::draw( SDL_Surface* screen, int step ) {
       
       dstRect.x = x * minTileWidth;
       dstRect.y = SCREEN_HEIGHT + offset - (y+1) * minTileHeight;
-      SDL_BlitSurface( tileSurfaces[ ((y+startLine)*tilesPerLine+x) % tileSurfaces.size()] , &srcRect, screen, &dstRect );
+      //SDL_BlitSurface( tileSurfaces[ ((y+startLine)*tilesPerLine+x) % tileSurfaces.size()] , &srcRect, screen, &dstRect );
+      SDL_RenderCopy(screen,
+                   tileSurfaces[ ((y+startLine)*tilesPerLine+x) % tileSurfaces.size()],
+                   &srcRect,
+                   &dstRect);
+
     }
   }
 }

@@ -30,15 +30,31 @@ using namespace std;
 
 Items *infoscreenItems;
 
-Infoscreen::Infoscreen( SDL_Surface *scr ) {
+Infoscreen::Infoscreen( SDL_Renderer *scr ) {
   screen = scr;
   font = new Font( FN_FONT_INTRO );
   fontHighlighted = new Font( FN_FONT_INTRO_HIGHLIGHTED );
+
   activeChoiceSprite = surfaceDB.loadSurface( FN_INTRO_SHOW_CHOICE );
+  SDL_Rect activeChoiceSpriteR;
+  SDL_QueryTexture(activeChoiceSprite, NULL, NULL, &activeChoiceSpriteR.w, &activeChoiceSpriteR.h);
+
   lightFighterIcon1 = surfaceDB.loadSurface( FN_LIGHT_FIGHTER_1_ICON );
+  SDL_Rect lightFighterIcon1R;
+  SDL_QueryTexture(lightFighterIcon1, NULL, NULL, &lightFighterIcon1R.w, &lightFighterIcon1R.h);
+
   lightFighterIcon2 = surfaceDB.loadSurface( FN_LIGHT_FIGHTER_2_ICON );
+  SDL_Rect lightFighterIcon2R;
+  SDL_QueryTexture(lightFighterIcon2, NULL, NULL, &lightFighterIcon2R.w, &lightFighterIcon2R.h);
+
   heavyFighterIcon1 = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_1_ICON );
+  SDL_Rect heavyFighterIcon1R;
+  SDL_QueryTexture(heavyFighterIcon1, NULL, NULL, &heavyFighterIcon1R.w, &heavyFighterIcon1R.h);
+
   heavyFighterIcon2 = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_2_ICON );
+  SDL_Rect heavyFighterIcon2R;
+  SDL_QueryTexture(heavyFighterIcon2, NULL, NULL, &heavyFighterIcon2R.w, &heavyFighterIcon2R.h);
+
   choose = mixer.loadSample( FN_SOUND_INTRO_CHOOSE, 100 );
   confirm = mixer.loadSample( FN_SOUND_INTRO_CONFIRM, 100 );
   if (infoscreenItems) delete infoscreenItems;
@@ -61,13 +77,17 @@ void Infoscreen::run() {
   }
 }
 
-void Infoscreen::putBitmapAtPosition( int x, int y, SDL_Surface* bitmap ) {
+void Infoscreen::putBitmapAtPosition( int x, int y, SDL_Texture* bitmap ) {
   SDL_Rect d;
-  d.x = x - bitmap->w / 2;
-  d.y = y - bitmap->h / 2;
-  d.w = bitmap->w;
-  d.h = bitmap->h;
-  SDL_BlitSurface( bitmap, 0, screen, &d );
+  SDL_Rect bitmapR;
+  SDL_QueryTexture(bitmap, NULL, NULL, &bitmapR.w, &bitmapR.h);
+
+  d.x = x - bitmapR.w / 2;
+  d.y = y - bitmapR.h / 2;
+  d.w = bitmapR.w;
+  d.h = bitmapR.h;
+  //SDL_BlitSurface( bitmap, 0, screen, &d );
+  SDL_RenderCopy(screen, bitmap, 0, &d );
 }
 
 void Infoscreen::draw() {
@@ -78,8 +98,9 @@ void Infoscreen::draw() {
   r.x = 250;
   r.y = 0;
   r.w = 1;
-  r.h = screen->h;
-  SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 0) );
+  r.h = SCREEN_HEIGHT;
+  printf("infoscreen->draw");
+  //SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 0) );
 
   for ( int i = 0; i < NR_INFOSCREEN_CHOICES; i++ ) {
     int ypos = 30 + i * 25;
@@ -327,7 +348,8 @@ void Infoscreen::draw() {
       break;
     }
   }
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
 }
 
 void Infoscreen::handleEvents() {

@@ -33,16 +33,18 @@ ShieldGlow::ShieldGlow( ShipTypes shipType ) {
       break;
     }
   }
-  nrFrames = spriteShieldGlow->w / spriteShieldGlow->h;
+
+  SDL_QueryTexture( spriteShieldGlow, NULL, NULL, &spriteShieldGlowR.w, &spriteShieldGlowR.h);
+  nrFrames = spriteShieldGlowR.w / spriteShieldGlowR.h;
   timePerFrame = RACER_SHIELD_DAMAGE_LIFETIME / nrFrames;
-  frameWidth = spriteShieldGlow->w / nrFrames;
+  frameWidth = spriteShieldGlowR.w / nrFrames;
   halfFrameWidth = frameWidth / 2;
-  halfFrameHeight = spriteShieldGlow->h / 2;
+  halfFrameHeight = spriteShieldGlowR.h / 2;
 }
 
 ShieldGlow::~ShieldGlow() {}
 
-void ShieldGlow::draw( SDL_Surface *screen, Vector2D pos, int time ) {
+void ShieldGlow::draw( SDL_Renderer *screen, Vector2D pos, int time ) {
   if ( time < 0 || RACER_SHIELD_DAMAGE_LIFETIME < time ) return;
   
   int actFrame = time / timePerFrame;
@@ -51,12 +53,13 @@ void ShieldGlow::draw( SDL_Surface *screen, Vector2D pos, int time ) {
   src.x = actFrame*frameWidth;
   src.y = 0;
   src.w = frameWidth;
-  src.h = spriteShieldGlow->h;
+  src.h = spriteShieldGlowR.h;
   dest.x = lroundf(pos.getX()) - halfFrameWidth;
   dest.y = lroundf(pos.getY()) - halfFrameHeight;
   dest.w = frameWidth;
-  dest.h = spriteShieldGlow->h;
+  dest.h = spriteShieldGlowR.h;
 
-  SDL_BlitSurface( spriteShieldGlow, &src, screen, &dest );
+  //SDL_BlitSurface( spriteShieldGlow, &src, screen, &dest );
+  SDL_RenderCopy(screen, spriteShieldGlow, &src, &dest );
 }
 

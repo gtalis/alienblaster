@@ -26,8 +26,10 @@
 #include "global.h"
 
 class Banner {
-  SDL_Surface *sprite;
-  SDL_Surface *spriteBonus;
+  SDL_Texture *sprite;
+  SDL_Rect spriteR;
+  SDL_Texture *spriteBonus;
+  SDL_Rect spriteBonusR;
 
   int sound;
 
@@ -42,7 +44,7 @@ class Banner {
   ~Banner();
   
   void update( int dT );
-  void draw( SDL_Surface *screen );
+  void draw( SDL_Renderer *screen );
   bool isExpired();
   bool movingAway();
 };

@@ -29,7 +29,8 @@ class Explosion {
 
   // a sprite, that contains horizontally all animationframes of the explosion.
   // it is assumed, that every frame is quadratic.
-  SDL_Surface *sprite;
+  SDL_Texture *sprite;
+  SDL_Rect spriteR;
 
   // how many frames does this explosion have?
   int nrAnimStages;
@@ -57,8 +58,8 @@ class Explosion {
   ~Explosion();
   // updates the position and the counters
   void update( int dT );
-  void drawAirExplosion(SDL_Surface *screen);
-  void drawGroundExplosion(SDL_Surface *screen);
+  void drawAirExplosion(SDL_Renderer *screen);
+  void drawGroundExplosion(SDL_Renderer *screen);
   bool isExpired() { return expired; }
 };
 

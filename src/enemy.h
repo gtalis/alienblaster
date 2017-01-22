@@ -32,8 +32,10 @@ class BoundingBox;
 
 class Enemy {
   private:
-  SDL_Surface *spriteEnemy;
-  SDL_Surface *spriteShadow;
+  SDL_Texture *spriteEnemy;
+  SDL_Rect spriteEnemyR;
+  SDL_Texture *spriteShadow;
+  SDL_Rect spriteShadowR;
   // for collision with racers or shots. 
   // A rectangle with racersize * 0.9 is used.
   BoundingBox *boundingBox;
@@ -97,10 +99,10 @@ class Enemy {
   void updateBoundingBox();
 
   public:
-  void drawGroundEnemy( SDL_Surface *screen );
-  void drawAirEnemy( SDL_Surface *screen );
-  void drawShadow( SDL_Surface *screen );
-  void drawStats( SDL_Surface *screen );
+  void drawGroundEnemy( SDL_Renderer *screen );
+  void drawAirEnemy( SDL_Renderer *screen );
+  void drawShadow( SDL_Renderer *screen );
+  void drawStats( SDL_Renderer *screen );
 
   // collision system
   // return if the line between the two points collides with the boundingBox

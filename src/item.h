@@ -28,7 +28,8 @@
 class BoundingBox;
 
 class Item {
-  SDL_Surface *sprite;
+  SDL_Texture *sprite;
+  SDL_Rect spriteR;
   BoundingBox *boundingBox;
 
   Vector2D pos;
@@ -47,7 +48,7 @@ class Item {
   
   void deleteItem();
 
-  void draw(SDL_Surface *screen);
+  void draw(SDL_Renderer *screen);
 
   inline bool isExpired() { return (timeLived >= ITEM_LIFETIME); }
   inline Vector2D getPos() { return pos; }

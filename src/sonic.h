@@ -30,13 +30,14 @@ class Sonic {
   void setActive( bool newActivation ) { active = newActivation; };
   void setWaveLength( float wvLength ) { waveLength = wvLength; };
   void setPos( Vector2D pos1, Vector2D pos2 );
-  void drawAtPos( SDL_Surface *screen, Vector2D pos1, Vector2D pos2 );
-  void draw( SDL_Surface *screen );
+  void drawAtPos( SDL_Renderer *screen, Vector2D pos1, Vector2D pos2 );
+  void draw( SDL_Renderer *screen );
 
 
   private:
 
-  SDL_Surface *sonicBall;
+  SDL_Texture *sonicBall;
+  SDL_Rect sonicBallR;
   bool active;
   Vector2D pos1;
   Vector2D pos2;

@@ -26,10 +26,11 @@ using namespace std;
 
 Font::Font(string fn) {
   sprite = surfaceDB.loadSurface( fn );
+  SDL_QueryTexture(sprite, NULL, NULL, &spriteR.w, &spriteR.h);
   charset = " ABCDEFGHIJKLMNOPQRSTUVWXYZÜÄÖabcdefghijklmnopqrstuvwxyzüäöß0123456789!\"§$%&/()=?*+'#,.-;:_@°\\";
   // 94 Zeichen
-  charWidth = sprite->w / 94;
-  charHeight = sprite->h;
+  charWidth = spriteR.w / 94;
+  charHeight = spriteR.h;
 }
 
 Font::~Font() {
@@ -45,10 +46,10 @@ int Font::getCharWidth() {
 }
 
 int Font::getCharHeight() {
-  return sprite->h;
+  return spriteR.h;
 }
 
-void Font::drawInt(SDL_Surface *screen, int posx, int posy, int val, int alignDigitCnt, int flags) {
+void Font::drawInt(SDL_Renderer *screen, int posx, int posy, int val, int alignDigitCnt, int flags) {
   int indent = 0;
   int digitCnt = 1;
   int i=1;
@@ -95,7 +96,8 @@ void Font::drawInt(SDL_Surface *screen, int posx, int posy, int val, int alignDi
       srcR.w = charWidth;
       srcR.h = charHeight;
       
-      SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, sprite, &srcR, &destR );
     }
     val /= 10;
     digitCnt--;
@@ -105,7 +107,7 @@ void Font::drawInt(SDL_Surface *screen, int posx, int posy, int val, int alignDi
 
 
   
-void Font::drawStr(SDL_Surface *screen, int posx, int posy, const string &text, int flags) {
+void Font::drawStr(SDL_Renderer *screen, int posx, int posy, const string &text, int flags) {
 
   int indent = 0;
   if ( flags & (FONT_ALIGN_CENTERED | FONT_ALIGN_RIGHT) ) {
@@ -138,14 +140,15 @@ void Font::drawStr(SDL_Surface *screen, int posx, int posy, const string &text, 
     destR.x = posx + indent;
     destR.y = posy;
     destR.w = charWidth;
-    destR.h = sprite->h;
+    destR.h = spriteR.h;
       
     srcR.x = x;
     srcR.y = 0;
     srcR.w = charWidth;
-    srcR.h = sprite->h;
+    srcR.h = spriteR.h;
       
-    SDL_BlitSurface( sprite, &srcR, screen, &destR );
+    //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+    SDL_RenderCopy(screen, sprite, &srcR, &destR );
 
     if (!(flags & FONT_MONOSPACE) && text[i] == ' ') {
       posx += ((charWidth * 2) / 3);

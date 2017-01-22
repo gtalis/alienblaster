@@ -31,19 +31,24 @@ SurfaceDB::SurfaceDB( Uint8 transparentR,
   transR = transparentR;
   transG = transparentG;
   transB = transparentB;
+  mRenderer = NULL;
 }
 
 SurfaceDB::~SurfaceDB() {
-  StringSurfaceMap::iterator pos;
+  StringTextureMap::iterator pos;
   // free all surfaces
   for ( pos = surfaceDB.begin(); pos != surfaceDB.end(); ++pos ) {
-    SDL_FreeSurface( pos->second );
+    SDL_DestroyTexture( pos->second );
   }
 }
 
-SDL_Surface *SurfaceDB::loadSurface( string fn, bool alpha ) {
+void SurfaceDB::setRenderer(SDL_Renderer *renderer)
+{
+    this->mRenderer = renderer;
+}
 
-  SDL_Surface *searchResult = getSurface( fn );
+SDL_Texture *SurfaceDB::loadSurface( string fn, bool alpha ) {
+  SDL_Texture *searchResult = getSurface( fn );
   if ( searchResult ) {
     return searchResult;
   }
@@ -56,21 +61,26 @@ SDL_Surface *SurfaceDB::loadSurface( string fn, bool alpha ) {
   }
   
   SDL_Surface *newSurface = SDL_LoadBMP( fn.c_str() );
-  SDL_SetColorKey( newSurface, SDL_SRCCOLORKEY, 
+  SDL_SetColorKey( newSurface, SDL_TRUE, 
 		   SDL_MapRGB(newSurface->format, transR, transG, transB) );
-  if ( alpha ) {
-    SDL_SetAlpha( newSurface, SDL_SRCALPHA, 128 );
-  }
 
-  surfaceDB[ fn ] = newSurface;
-  return newSurface;
+
+  SDL_Texture *newTexture = SDL_CreateTextureFromSurface(mRenderer, newSurface);
+  if ( alpha ) {
+    SDL_SetTextureAlphaMod( newTexture, 128 );
+  }
+  
+  SDL_FreeSurface(newSurface);
+
+  surfaceDB[ fn ] = newTexture;
+  return newTexture;
 }
 
-SDL_Surface *SurfaceDB::getSurface( string fn ) {
+SDL_Texture *SurfaceDB::getSurface( string fn ) {
   if ( surfaceDB.empty() ) {
     return 0;
   } else {
-    StringSurfaceMap::iterator pos = surfaceDB.find( fn );
+    StringTextureMap::iterator pos = surfaceDB.find( fn );
     if ( pos == surfaceDB.end() ) {
       return 0;
     } else {

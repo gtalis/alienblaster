@@ -96,9 +96,11 @@ Item::Item(const Vector2D &position, const Vector2D &velocity, ItemTypes itemTyp
     }
   }
 
-  boundingBox = new BoundingBox( lroundf(pos.getX() - sprite->w / 2.0),
-				 lroundf(pos.getY() - sprite->h / 2.0),
-				 sprite->w, sprite->h );
+  SDL_QueryTexture(sprite, NULL, NULL, &spriteR.w, &spriteR.h);
+
+  boundingBox = new BoundingBox( lroundf(pos.getX() - spriteR.w / 2.0),
+				 lroundf(pos.getY() - spriteR.h / 2.0),
+				 spriteR.w, spriteR.h );
 }
 
 Item::~Item() {
@@ -117,17 +119,18 @@ void Item::deleteItem() {
 }
 
 void Item::updateBoundingBox() {
-  boundingBox->moveUpperBound( lroundf(pos.getY() - sprite->h * 0.5) );
-  boundingBox->moveLeftBound( lroundf(pos.getX() - sprite->w * 0.5) );
+  boundingBox->moveUpperBound( lroundf(pos.getY() - spriteR.h * 0.5) );
+  boundingBox->moveLeftBound( lroundf(pos.getX() - spriteR.w * 0.5) );
 }
 
-void Item::draw(SDL_Surface *screen) {
+void Item::draw(SDL_Renderer *screen) {
   SDL_Rect r;
-  r.x = lroundf(pos.getX()) - sprite->w / 2;
-  r.y = lroundf(pos.getY()) - sprite->h / 2;
-  r.w = sprite->w;
-  r.h = sprite->h;
-  SDL_BlitSurface( sprite, 0, screen, &r );
+  r.x = lroundf(pos.getX()) - spriteR.w / 2;
+  r.y = lroundf(pos.getY()) - spriteR.h / 2;
+  r.w = spriteR.w;
+  r.h = spriteR.h;
+  //SDL_BlitSurface( sprite, 0, screen, &r );
+  SDL_RenderCopy(screen, sprite, 0, &r );
 }
 
 BoundingBox *Item::getBoundingBox() {

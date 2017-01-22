@@ -41,8 +41,8 @@ class Explosions {
   // deletes the explosions, that have timed out
   void expireExplosions();
   // draws all explosions
-  void drawAirExplosions( SDL_Surface *screen );
-  void drawGroundExplosions( SDL_Surface *screen );
+  void drawAirExplosions( SDL_Renderer *screen );
+  void drawGroundExplosions( SDL_Renderer *screen );
 };
 
 #endif

@@ -44,6 +44,9 @@ Shot::Shot( ShotTypes shotType, int playerNr, Vector2D position, float angle ) {
   generatesSmokePuffs = false;
   timeToNextSmokePuff = 100;
 
+  sprite = 0;
+  spriteShadow = 0;
+
   switch (shotType) {
     // primary shots
   case SHOT_NORMAL:
@@ -246,6 +249,10 @@ Shot::Shot( ShotTypes shotType, int playerNr, Vector2D position, float angle ) {
     }
   }
 
+  SDL_QueryTexture(sprite, NULL, NULL, &spriteR.w, &spriteR.h);
+  if (spriteShadow) {
+    SDL_QueryTexture(spriteShadow, NULL, NULL, &spriteShadowR.w, &spriteShadowR.h);
+  }
 }
 
 
@@ -374,10 +381,10 @@ bool Shot::collidePlayerShot( Vector2D posOld ) {
     // only against air
   case SHOT_ENERGY_BEAM:
     {
-      BoundingBox box( lroundf(posOld.getX()) - sprite->w / 2,
-		       lroundf(pos.getY()) - sprite->w / 2,
-		       sprite->w,
-		       lroundf((posOld-pos).getY()) + sprite->h );		       
+      BoundingBox box( lroundf(posOld.getX()) - spriteR.w / 2,
+		       lroundf(pos.getY()) - spriteR.w / 2,
+		       spriteR.w,
+		       lroundf((posOld-pos).getY()) + spriteR.h );		       
       for ( unsigned int i = 0; i < enemys->getNrEnemys(); i++ ) {
 	if ( ENEMY_FLYING[ enemys->getEnemy(i)->getType() ] &&
 	     enemys->getEnemy(i)->collidesWith( &box ) ) {
@@ -642,7 +649,7 @@ void Shot::addExplosion() {
 
 ////////////////////
 
-void Shot::drawShadow(SDL_Surface *screen) {
+void Shot::drawShadow(SDL_Renderer *screen) {
   switch (shotType) {
   case SHOT_KICK_ASS_ROCKET:
   case SHOT_HF_KICK_ASS_ROCKET:
@@ -650,37 +657,39 @@ void Shot::drawShadow(SDL_Surface *screen) {
   case SPECIAL_SHOT_NUKE:
     {
       SDL_Rect shadowR;
-      shadowR.x = lroundf(pos.getX()) - spriteShadow->w / 2 - 7;
-      shadowR.y = lroundf(pos.getY()) - spriteShadow->h / 2 + 7;
-      shadowR.w = spriteShadow->w;
-      shadowR.h = spriteShadow->h;
-      SDL_BlitSurface( spriteShadow, 0, screen, &shadowR );
+      shadowR.x = lroundf(pos.getX()) - spriteShadowR.w / 2 - 7;
+      shadowR.y = lroundf(pos.getY()) - spriteShadowR.h / 2 + 7;
+      shadowR.w = spriteShadowR.w;
+      shadowR.h = spriteShadowR.h;
+      //SDL_BlitSurface( spriteShadow, 0, screen, &shadowR );
+      SDL_RenderCopy(screen, spriteShadow, 0, &shadowR );
       break;
     }
   case ENEMY_SHOT_TANK_ROCKET: 
     {
       SDL_Rect destR;
       SDL_Rect srcR;
-      destR.x = lroundf(pos.getX()) - spriteShadow->w / 16 - 10;
-      destR.y = lroundf(pos.getY()) - spriteShadow->h / 2 + 10;
-      destR.w = spriteShadow->w / 8;
-      destR.h = spriteShadow->h;
+      destR.x = lroundf(pos.getX()) - spriteShadowR.w / 16 - 10;
+      destR.y = lroundf(pos.getY()) - spriteShadowR.h / 2 + 10;
+      destR.w = spriteShadowR.w / 8;
+      destR.h = spriteShadowR.h;
       float angle = vel.getDirection() + 202.5;
       int idx = lroundf(angle) % 360;
       idx = idx / 45;
-      srcR.x = idx * spriteShadow->w / 8;
+      srcR.x = idx * spriteShadowR.w / 8;
       srcR.y = 0;
-      srcR.w = spriteShadow->w / 8;
-      srcR.h = spriteShadow->h;
+      srcR.w = spriteShadowR.w / 8;
+      srcR.h = spriteShadowR.h;
 
-      SDL_BlitSurface( spriteShadow, &srcR, screen, &destR );
+      //SDL_BlitSurface( spriteShadow, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, spriteShadow, &srcR, &destR );
       break;
     }
   default: break;
   }
 }
 
-void Shot::drawGroundShot(SDL_Surface *screen) {
+void Shot::drawGroundShot(SDL_Renderer *screen) {
   switch (shotType) {
   case SHOT_KICK_ASS_ROCKET:
   case SHOT_HF_KICK_ASS_ROCKET:
@@ -688,23 +697,24 @@ void Shot::drawGroundShot(SDL_Surface *screen) {
     {
       SDL_Rect destR;
       SDL_Rect srcR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 2;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w;
-      destR.h = sprite->h;
+      destR.x = lroundf(pos.getX()) - spriteR.w / 2;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w;
+      destR.h = spriteR.h;
       srcR.x = 0;
       srcR.y = 0;
-      srcR.w = sprite->w;
-      srcR.h = sprite->h;
+      srcR.w = spriteR.w;
+      srcR.h = spriteR.h;
 
-      SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, sprite, &srcR, &destR );
       break;
     }
   default: break;
   }
 }
  
-void Shot::drawGroundAirShot(SDL_Surface *screen) {
+void Shot::drawGroundAirShot(SDL_Renderer *screen) {
   switch (shotType) {
   case SHOT_DUMBFIRE:
   case SHOT_DUMBFIRE_DOUBLE:
@@ -713,10 +723,10 @@ void Shot::drawGroundAirShot(SDL_Surface *screen) {
     {
       SDL_Rect destR;
       SDL_Rect srcR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 16;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w / 8;
-      destR.h = sprite->h;
+      destR.x = lroundf(pos.getX()) - spriteR.w / 16;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w / 8;
+      destR.h = spriteR.h;
       // TODO: eight directions are outdated for dumbfire, but existent in the image
       float angle = vel.getDirection() + 202.5;
       int idx = lroundf(angle) % 360;
@@ -726,41 +736,45 @@ void Shot::drawGroundAirShot(SDL_Surface *screen) {
       srcR.w = 8;
       srcR.h = 8;
 
-      SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, sprite, &srcR, &destR );
       break;
     }
   case SHOT_MACHINE_GUN:
   case SHOT_HF_LASER:
     {
       SDL_Rect destR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 2;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w;
-      destR.h = sprite->h;
-      SDL_BlitSurface( sprite, 0, screen, &destR );
+      destR.x = lroundf(pos.getX()) - spriteR.w / 2;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w;
+      destR.h = spriteR.h;
+      //SDL_BlitSurface( sprite, 0, screen, &destR );
+      SDL_RenderCopy(screen, sprite, 0, &destR );
       break;
     }
   case SHOT_ENERGY_BEAM:
     {
       SDL_Rect destR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 2;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w;
-      destR.h = sprite->h;
-      SDL_BlitSurface( sprite, 0, screen, &destR );
-      destR.x = lroundf(pos.getX()) - sprite->w / 2;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      SDL_BlitSurface( sprite, 0, screen, &destR );
+      destR.x = lroundf(pos.getX()) - spriteR.w / 2;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w;
+      destR.h = spriteR.h;
+      //SDL_BlitSurface( sprite, 0, screen, &destR );
+      SDL_RenderCopy(screen, sprite, 0, &destR );
+      destR.x = lroundf(pos.getX()) - spriteR.w / 2;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      //SDL_BlitSurface( sprite, 0, screen, &destR );
+      SDL_RenderCopy(screen, sprite, 0, &destR );
       break;
     }
   case SPECIAL_SHOT_HEATSEEKER:
     {
       SDL_Rect destR;
       SDL_Rect srcR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 16;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w / 8;
-      destR.h = sprite->h;
+      destR.x = lroundf(pos.getX()) - spriteR.w / 16;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w / 8;
+      destR.h = spriteR.h;
 
       float angle = vel.getDirection() + 202.5;
       int idx = lroundf(angle) % 360;
@@ -770,27 +784,29 @@ void Shot::drawGroundAirShot(SDL_Surface *screen) {
       srcR.w = 8;
       srcR.h = 8;
 
-      SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, sprite, &srcR, &destR );
       break;
     }
   case ENEMY_SHOT_TANK_ROCKET:
     {
       SDL_Rect destR;
       SDL_Rect srcR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 16;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w / 8;
-      destR.h = sprite->h;
+      destR.x = lroundf(pos.getX()) - spriteR.w / 16;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w / 8;
+      destR.h = spriteR.h;
 
       float angle = vel.getDirection() + 202.5;
       int idx = lroundf(angle) % 360;
       idx = idx / 45;
-      srcR.x = idx * sprite->w / 8;
+      srcR.x = idx * spriteR.w / 8;
       srcR.y = 0;
-      srcR.w = sprite->w / 8;
-      srcR.h = sprite->h;
+      srcR.w = spriteR.w / 8;
+      srcR.h = spriteR.h;
 
-      SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      //SDL_BlitSurface( sprite, &srcR, screen, &destR );
+      SDL_RenderCopy(screen, sprite, &srcR, &destR );
       break;
     }
 
@@ -798,7 +814,7 @@ void Shot::drawGroundAirShot(SDL_Surface *screen) {
   }
 }
 
-void Shot::drawAirShot(SDL_Surface *screen) {
+void Shot::drawAirShot(SDL_Renderer *screen) {
   switch (shotType) {
   case SHOT_NORMAL:
   case SHOT_NORMAL_HEAVY:
@@ -814,11 +830,12 @@ void Shot::drawAirShot(SDL_Surface *screen) {
   case ENEMY_SHOT_NORMAL:
     {
       SDL_Rect destR;
-      destR.x = lroundf(pos.getX()) - sprite->w / 2;
-      destR.y = lroundf(pos.getY()) - sprite->h / 2;
-      destR.w = sprite->w;
-      destR.h = sprite->h;
-      SDL_BlitSurface( sprite, 0, screen, &destR );
+      destR.x = lroundf(pos.getX()) - spriteR.w / 2;
+      destR.y = lroundf(pos.getY()) - spriteR.h / 2;
+      destR.w = spriteR.w;
+      destR.h = spriteR.h;
+      //SDL_BlitSurface( sprite, 0, screen, &destR );
+      SDL_RenderCopy(screen, sprite, 0, &destR );
       break;
     }
   default: break;
@@ -836,7 +853,7 @@ void Shot::generateSmokePuff( int dT) {
   timeToNextSmokePuff -= dT;
   if ( timeToNextSmokePuff < 0 ) {
     Vector2D relPos = -vel;
-    relPos.setLength( sprite->h / 2 );
+    relPos.setLength( spriteR.h / 2 );
     if ( shotType == SHOT_HELLFIRE ||
 	 shotType == ENEMY_SHOT_TANK_ROCKET ) {
 

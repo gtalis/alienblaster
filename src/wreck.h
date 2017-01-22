@@ -26,7 +26,8 @@
 #include "global.h"
 
 class Wreck {
-  SDL_Surface *sprite;
+  SDL_Texture *sprite;
+  SDL_Rect spriteR;
 
   Vector2D pos;
   Vector2D vel;
@@ -36,7 +37,7 @@ class Wreck {
   Wreck( Vector2D position, WreckTypes wreckType );
   ~Wreck();
   void update( int dT );
-  void draw(SDL_Surface *screen);
+  void draw(SDL_Renderer *screen);
   bool isExpired();
   void deleteWreck();
 

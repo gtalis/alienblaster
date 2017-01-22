@@ -80,6 +80,8 @@ Wreck::Wreck(Vector2D position, WreckTypes wreckType) {
       break;
     }
   }
+
+  SDL_QueryTexture(sprite, NULL, NULL, &spriteR.w, &spriteR.h);
 }
 
 
@@ -94,13 +96,14 @@ void Wreck::update( int dT ) {
 }
 
 
-void Wreck::draw(SDL_Surface *screen) {
+void Wreck::draw(SDL_Renderer *screen) {
   SDL_Rect r;
-  r.x = lroundf(pos.getX()) - sprite->w / 2;
-  r.y = lroundf(pos.getY()) - sprite->h / 2;
-  r.w = sprite->w;
-  r.h = sprite->h;
-  SDL_BlitSurface( sprite, 0, screen, &r );
+  r.x = lroundf(pos.getX()) - spriteR.w / 2;
+  r.y = lroundf(pos.getY()) - spriteR.h / 2;
+  r.w = spriteR.w;
+  r.h = spriteR.h;
+  //SDL_BlitSurface( sprite, 0, screen, &r );
+  SDL_RenderCopy(screen, sprite, 0, &r );
 }
 
 

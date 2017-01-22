@@ -69,9 +69,9 @@ class Racers {
   // recharge the shields
   void rechargeShield( int dT );
   // draws the racers.
-  void drawRacers( SDL_Surface *screen );
-  void drawShadows( SDL_Surface *screen );
-  void drawStats( SDL_Surface *screen );
+  void drawRacers( SDL_Renderer *screen );
+  void drawShadows( SDL_Renderer *screen );
+  void drawStats( SDL_Renderer *screen );
 
   // returns, which racer has shot more enemys
   //int getWinner();
@@ -84,7 +84,7 @@ class Racers {
   int getPointsArcadeMode();
 
   void getKeyActionMaps();
-  void handleEvent( const SDLKey key, const bool pressed );
+  void handleEvent( const SDL_Keycode key, const bool pressed );
   private:
   void handlePlayerEvent( PlayerEvent pEvent, int playerNr, bool keyDown );
 };

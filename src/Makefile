@@ -17,8 +17,8 @@ OPTIMIZATION=-g
 DATADIR ?= "/usr/local/share/alienblaster"
 
 # SDL library
-SDL_LIBS=$(shell sdl-config --libs)
-SDL_FLAGS=$(shell sdl-config --cflags)
+SDL_LIBS=$(shell sdl2-config --libs)
+SDL_FLAGS=$(shell sdl2-config --cflags)
 
 # game flags
 GAME_FLAGS=-D_GNU_SOURCE -Wall -Winline -finline-functions $(SDL_FLAGS) \

@@ -36,11 +36,15 @@ const int NR_MENU_ARCADE_CHOICES = 2;
 
 class MenuArcadeMode {
   private:
-  SDL_Surface *screen;
-  SDL_Surface *arcadeSprite;
-  SDL_Surface *activeChoiceSprite;
-  SDL_Surface *lightFighterIcon1;
-  SDL_Surface *heavyFighterIcon1;
+  SDL_Renderer *screen;
+  SDL_Texture *arcadeSprite;
+  SDL_Rect arcadeSpriteR;
+  SDL_Texture *activeChoiceSprite;
+  SDL_Rect activeChoiceSpriteR;
+  SDL_Texture *lightFighterIcon1;
+  SDL_Rect lightFighterIcon1R;
+  SDL_Texture *heavyFighterIcon1;
+  SDL_Rect heavyFighterIcon1R;
   Font *font;
   Font *fontHighlighted;
 
@@ -54,7 +58,7 @@ class MenuArcadeMode {
   bool playerOneLightFighter;
 
   public:
-  MenuArcadeMode( SDL_Surface *scr );
+  MenuArcadeMode( SDL_Renderer *scr );
   ~MenuArcadeMode();
   void run( GameStates &gameState, int points=-1 );
   bool getPlayerOneLightFighter();

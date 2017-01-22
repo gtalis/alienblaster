@@ -29,17 +29,23 @@ using namespace std;
 #include "racer.h"
 #include "racers.h"
 
-SetDifficulty::SetDifficulty( SDL_Surface *scr ) {
+SetDifficulty::SetDifficulty( SDL_Renderer *scr ) {
   screen = scr;
   introSprite = surfaceDB.loadSurface( FN_ALIENBLASTER_INTRO );
+  SDL_QueryTexture (introSprite, NULL, NULL, &introSpriteR.w, &introSpriteR.h);
   activeChoiceSprite = surfaceDB.loadSurface( FN_INTRO_SHOW_CHOICE );
+  SDL_QueryTexture (activeChoiceSprite, NULL, NULL, &activeChoiceSpriteR.w, &activeChoiceSpriteR.h);
 
   font = new Font( FN_FONT_INTRO );
   fontHighlighted = new Font( FN_FONT_INTRO_HIGHLIGHTED );
   lightFighterIcon1 = surfaceDB.loadSurface( FN_LIGHT_FIGHTER_1_ICON );
+  SDL_QueryTexture (lightFighterIcon1, NULL, NULL, &lightFighterIcon1R.w, &lightFighterIcon1R.h);
   lightFighterIcon2 = surfaceDB.loadSurface( FN_LIGHT_FIGHTER_2_ICON );
+  SDL_QueryTexture (lightFighterIcon2, NULL, NULL, &lightFighterIcon2R.w, &lightFighterIcon2R.h);
   heavyFighterIcon1 = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_1_ICON );
+  SDL_QueryTexture (heavyFighterIcon1, NULL, NULL, &heavyFighterIcon1R.w, &heavyFighterIcon1R.h);
   heavyFighterIcon2 = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_2_ICON );
+  SDL_QueryTexture (heavyFighterIcon2, NULL, NULL, &heavyFighterIcon2R.w, &heavyFighterIcon2R.h);
   choose = mixer.loadSample( FN_SOUND_INTRO_CHOOSE, 100 );
   confirm = mixer.loadSample( FN_SOUND_INTRO_CONFIRM, 100 );
 
@@ -72,19 +78,21 @@ bool SetDifficulty::getPlayerTwoLightFighter() {
 void SetDifficulty::draw() {
   videoserver->clearScreen();
   SDL_Rect r;
-  r.x = screen->w / 2 - introSprite->w / 2;
+  r.x = SCREEN_WIDTH / 2 - introSpriteR.w / 2;
   r.y = 0;
-  r.w = introSprite->w;
-  r.h = introSprite->h;  
-  SDL_BlitSurface( introSprite, 0, screen, &r );
+  r.w = introSpriteR.w;
+  r.h = introSpriteR.h;  
+  //SDL_BlitSurface( introSprite, 0, screen, &r );
+  SDL_RenderCopy(screen, introSprite, 0, &r );
 
   for ( int i = 0; i < NR_DIFFICULTY_CHOICES; i++ ) {
     if( activeChoice == i ) {
-      r.x = 230 - activeChoiceSprite->w - 8;
+      r.x = 230 - activeChoiceSpriteR.w - 8;
       r.y = 258 + i * 40;
-      r.w = activeChoiceSprite->w;
-      r.h = activeChoiceSprite->h;
-      SDL_BlitSurface( activeChoiceSprite, 0, screen, &r );
+      r.w = activeChoiceSpriteR.w;
+      r.h = activeChoiceSpriteR.h;
+      //SDL_BlitSurface( activeChoiceSprite, 0, screen, &r );
+      SDL_RenderCopy(screen, activeChoiceSprite, 0, &r );
       fontHighlighted->drawStr( screen, 230, 260 + i * 40, SET_DIFFICULTY_CHOICES[ i ] );
     } else {
       font->drawStr( screen, 230, 260 + i * 40, SET_DIFFICULTY_CHOICES[ i ] );
@@ -93,17 +101,19 @@ void SetDifficulty::draw() {
       font->drawStr( screen, 20, 20, "1-Player" );
       font->drawStr( screen, 100, 270, "Player 1", FONT_ALIGN_CENTERED );
       if ( playerOneLightFighter ) {
-        r.x = 100 - lightFighterIcon1->w / 2;
-        r.y = 340 - lightFighterIcon1->h / 2;
-        r.w = lightFighterIcon1->w;
-        r.h = lightFighterIcon1->h;
-        SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+        r.x = 100 - lightFighterIcon1R.w / 2;
+        r.y = 340 - lightFighterIcon1R.h / 2;
+        r.w = lightFighterIcon1R.w;
+        r.h = lightFighterIcon1R.h;
+        //SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+        SDL_RenderCopy(screen, lightFighterIcon1, 0, &r );
       } else {
-        r.x = 100 - heavyFighterIcon1->w / 2;
-        r.y = 340 - heavyFighterIcon1->h / 2;
-        r.w = heavyFighterIcon1->w;
-        r.h = heavyFighterIcon1->h;
-        SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+        r.x = 100 - heavyFighterIcon1R.w / 2;
+        r.y = 340 - heavyFighterIcon1R.h / 2;
+        r.w = heavyFighterIcon1R.w;
+        r.h = heavyFighterIcon1R.h;
+        //SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+        SDL_RenderCopy(screen, heavyFighterIcon1, 0, &r );
       }
       fontHighlighted->drawStr( screen, 100, 400, "Press \"1\"", FONT_ALIGN_CENTERED );
       fontHighlighted->drawStr( screen, 100, 430, "To Change", FONT_ALIGN_CENTERED );
@@ -112,39 +122,44 @@ void SetDifficulty::draw() {
       font->drawStr( screen, 20, 20, "2-Player" );
       font->drawStr( screen, 100, 270, "Player 1", FONT_ALIGN_CENTERED );
       if ( playerOneLightFighter ) {
-        r.x = 100 - lightFighterIcon1->w / 2;
-        r.y = 340 - lightFighterIcon1->h / 2;
-        r.w = lightFighterIcon1->w;
-        r.h = lightFighterIcon1->h;
-        SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+        r.x = 100 - lightFighterIcon1R.w / 2;
+        r.y = 340 - lightFighterIcon1R.h / 2;
+        r.w = lightFighterIcon1R.w;
+        r.h = lightFighterIcon1R.h;
+        //SDL_BlitSurface( lightFighterIcon1, 0, screen, &r );
+        SDL_RenderCopy(screen, lightFighterIcon1, 0, &r );
       } else {
-        r.x = 100 - heavyFighterIcon1->w / 2;
-        r.y = 340 - heavyFighterIcon1->h / 2;
-        r.w = heavyFighterIcon1->w;
-        r.h = heavyFighterIcon1->h;
-        SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+        r.x = 100 - heavyFighterIcon1R.w / 2;
+        r.y = 340 - heavyFighterIcon1R.h / 2;
+        r.w = heavyFighterIcon1R.w;
+        r.h = heavyFighterIcon1R.h;
+        //SDL_BlitSurface( heavyFighterIcon1, 0, screen, &r );
+        SDL_RenderCopy(screen, heavyFighterIcon1, 0, &r );
       }
       fontHighlighted->drawStr( screen, 100, 400, "Press \"1\"", FONT_ALIGN_CENTERED );
       fontHighlighted->drawStr( screen, 100, 430, "To Change", FONT_ALIGN_CENTERED );
       font->drawStr( screen, 560, 270, "Player 2", FONT_ALIGN_CENTERED );
       if ( playerTwoLightFighter ) {
-        r.x = 560 - lightFighterIcon1->w / 2;
-        r.y = 340 - lightFighterIcon1->h / 2;
-        r.w = lightFighterIcon2->w;
-        r.h = lightFighterIcon2->h;
-        SDL_BlitSurface( lightFighterIcon2, 0, screen, &r );
+        r.x = 560 - lightFighterIcon1R.w / 2;
+        r.y = 340 - lightFighterIcon1R.h / 2;
+        r.w = lightFighterIcon2R.w;
+        r.h = lightFighterIcon2R.h;
+        //SDL_BlitSurface( lightFighterIcon2, 0, screen, &r );
+        SDL_RenderCopy(screen, lightFighterIcon2, 0, &r );
       } else {
-        r.x = 560 - heavyFighterIcon1->w / 2;
-        r.y = 340 - heavyFighterIcon1->h / 2;
-        r.w = heavyFighterIcon2->w;
-        r.h = heavyFighterIcon2->h;
-        SDL_BlitSurface( heavyFighterIcon2, 0, screen, &r );
+        r.x = 560 - heavyFighterIcon1R.w / 2;
+        r.y = 340 - heavyFighterIcon1R.h / 2;
+        r.w = heavyFighterIcon2R.w;
+        r.h = heavyFighterIcon2R.h;
+        //SDL_BlitSurface( heavyFighterIcon2, 0, screen, &r );
+        SDL_RenderCopy(screen, heavyFighterIcon2, 0, &r );
       }
       fontHighlighted->drawStr( screen, 560, 400, "Press \"2\"", FONT_ALIGN_CENTERED );
       fontHighlighted->drawStr( screen, 560, 430, "To Change", FONT_ALIGN_CENTERED );
     }
   }
-  SDL_Flip( screen );
+  //SDL_Flip( screen );
+  SDL_RenderPresent( screen );
 }
 
 void SetDifficulty::handleEvents( GameStates &gameState ) {
@@ -163,7 +178,8 @@ void SetDifficulty::handleEvents( GameStates &gameState ) {
             break;
           }
           case SDLK_F5: {
-            SDL_WM_ToggleFullScreen( screen );
+            printf("Toggle fullscreen\n");
+            //SDL_WM_ToggleFullScreen( screen );
             break;
           }
           case SDLK_F7: {

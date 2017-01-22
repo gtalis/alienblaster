@@ -37,8 +37,9 @@ using namespace std;
 Racer::Racer( string fnSprite, int whichPlayer, Vector2D startpos , int newShipType) {
 
   spriteRacerBase = surfaceDB.loadSurface( fnSprite );
-  drawRectBase.w = spriteRacerBase->w;
-  drawRectBase.h = spriteRacerBase->h;
+  SDL_QueryTexture(spriteRacerBase, NULL, NULL, &spriteRacerBaseR.w, &spriteRacerBaseR.h);
+  drawRectBase.w = spriteRacerBaseR.w;
+  drawRectBase.h = spriteRacerBaseR.h;
   playerNr = whichPlayer;
   pos = startpos;
   shipType = newShipType;
@@ -128,8 +129,14 @@ Racer::Racer( string fnSprite, int whichPlayer, Vector2D startpos , int newShipT
     }  
   }
 
+  SDL_QueryTexture( spriteFighterIcon, NULL, NULL, &spriteFighterIconR.w, &spriteFighterIconR.w);
+  SDL_QueryTexture( spriteShadow, NULL, NULL, &spriteShadowR.w, &spriteShadowR.w);
+  //SDL_QueryTexture( shieldGlow, NULL, NULL, &shieldGlowR.w, &shieldGlowR.w);
+
+
   spriteHPStat = surfaceDB.loadSurface( FN_HITPOINTS_STAT );
-  pixPerHP = spriteHPStat->w / (maxDamage + maxShield);
+  SDL_QueryTexture( spriteHPStat, NULL, NULL, &spriteHPStatR.w, &spriteHPStatR.w);
+  pixPerHP = spriteHPStatR.w / (maxDamage + maxShield);
 
   shieldDamageEndTime = 0;
   shieldDamageActive = false;
@@ -145,20 +152,23 @@ Racer::Racer( string fnSprite, int whichPlayer, Vector2D startpos , int newShipT
   sndShotSecondary = mixer.loadSample( FN_SOUND_SHOT_SECONDARY );
 
   spriteSpecials = surfaceDB.loadSurface( FN_ICONS_SPECIALS );
+  SDL_QueryTexture( spriteSpecials, NULL, NULL, &spriteSpecialsR.w, &spriteSpecialsR.w);
   spriteSecondaryWeapons = surfaceDB.loadSurface( FN_ICONS_SECONDARY_WEAPONS );
+  SDL_QueryTexture( spriteSecondaryWeapons, NULL, NULL, &spriteSecondaryWeaponsR.w, &spriteSecondaryWeaponsR.w);
 
   spriteDeflector = surfaceDB.loadSurface( FN_HEAVY_FIGHTER_DEFLECTOR, true );
-  drawRectDeflector.w = spriteDeflector->w;
-  drawRectDeflector.h = spriteDeflector->h;
+  SDL_QueryTexture( spriteDeflector, NULL, NULL, &spriteDeflectorR.w, &spriteDeflectorR.w);
+  drawRectDeflector.w = spriteDeflectorR.w;
+  drawRectDeflector.h = spriteDeflectorR.h;
 
   boundaryRect = 
-    new RectangleGeo(Vector2D(spriteRacerBase->w/(2*RACER_IMAGE_CNT), spriteRacerBase->h/2),
-		     Vector2D(320-spriteRacerBase->w/(2*RACER_IMAGE_CNT), 200-spriteRacerBase->h/2));
+    new RectangleGeo(Vector2D(spriteRacerBaseR.w/(2*RACER_IMAGE_CNT), spriteRacerBaseR.h/2),
+		     Vector2D(320-spriteRacerBaseR.w/(2*RACER_IMAGE_CNT), 200-spriteRacerBaseR.h/2));
 
-  boundingBox = new BoundingBox( lroundf(pos.getX() - (spriteRacerBase->w / RACER_IMAGE_CNT) * 0.45),
-				 lroundf(pos.getY() - spriteRacerBase->h * 0.45),
-				 lroundf((spriteRacerBase->w / RACER_IMAGE_CNT) * 0.9),
-				 lroundf(spriteRacerBase->h * 0.9) );
+  boundingBox = new BoundingBox( lroundf(pos.getX() - (spriteRacerBaseR.w / RACER_IMAGE_CNT) * 0.45),
+				 lroundf(pos.getY() - spriteRacerBaseR.h * 0.45),
+				 lroundf((spriteRacerBaseR.w / RACER_IMAGE_CNT) * 0.9),
+				 lroundf(spriteRacerBaseR.h * 0.9) );
   
   shipAngle = -90;
   vel = Vector2D(0,0);
@@ -214,61 +224,64 @@ Vector2D Racer::move( int dT ) {
 
 
 void Racer::clipWorld() {
-  int left = lroundf(pos.getX()) - (spriteRacerBase->w / (2*RACER_IMAGE_CNT));
-  int top = lroundf(pos.getY()) - (spriteRacerBase->h / 2);
-  int right = lroundf(pos.getX()) + (spriteRacerBase->w / (2*RACER_IMAGE_CNT));
-  int bottom = lroundf(pos.getY()) + (spriteRacerBase->h / 2);
+  int left = lroundf(pos.getX()) - (spriteRacerBaseR.w / (2*RACER_IMAGE_CNT));
+  int top = lroundf(pos.getY()) - (spriteRacerBaseR.h / 2);
+  int right = lroundf(pos.getX()) + (spriteRacerBaseR.w / (2*RACER_IMAGE_CNT));
+  int bottom = lroundf(pos.getY()) + (spriteRacerBaseR.h / 2);
   if ( left <= 1 ) {
-    pos.setX( 1 + spriteRacerBase->w / (2*RACER_IMAGE_CNT) );
+    pos.setX( 1 + spriteRacerBaseR.w / (2*RACER_IMAGE_CNT) );
   } else if ( right >= SCREEN_WIDTH - 1 ) {
-    pos.setX( SCREEN_WIDTH - 2 - spriteRacerBase->w / (2*RACER_IMAGE_CNT));
+    pos.setX( SCREEN_WIDTH - 2 - spriteRacerBaseR.w / (2*RACER_IMAGE_CNT));
   }
   if ( top <= 1 ) {
-    pos.setY( 1 + spriteRacerBase->h / 2 );
+    pos.setY( 1 + spriteRacerBaseR.h / 2 );
   } else if ( bottom >= SCREEN_HEIGHT - 1 ) {
-    pos.setY( SCREEN_HEIGHT - 2 - spriteRacerBase->h / 2 );
+    pos.setY( SCREEN_HEIGHT - 2 - spriteRacerBaseR.h / 2 );
   }
 }
     
 
-void Racer::drawStats( SDL_Surface *screen ) {
+void Racer::drawStats( SDL_Renderer *screen ) {
   SDL_Rect srcR, destR;
 
   int indent = 5;
 
   if ( playerNr == 1 ) {
-    indent = screen->w - 
-      ( 7 + 3 * fontSize + (spriteSpecials->w / (NR_SPECIALS-1)) ) -
-      ( 5 + spriteSecondaryWeapons->w / NR_SECONDARY_WEAPONS );
+    /* TODO: pass screen width and height as parameters to this class? */
+    indent = SCREEN_WIDTH - 
+      ( 7 + 3 * fontSize + (spriteSpecialsR.w / (NR_SPECIALS-1)) ) -
+      ( 5 + spriteSecondaryWeaponsR.w / NR_SECONDARY_WEAPONS );
   }
 
   int x = indent;
 
   // draw Secondary Weapon
-  srcR.x = (activeSecondary - SHOT_DUMBFIRE) * spriteSecondaryWeapons->w / NR_SECONDARY_WEAPONS;
+  srcR.x = (activeSecondary - SHOT_DUMBFIRE) * spriteSecondaryWeaponsR.w / NR_SECONDARY_WEAPONS;
   srcR.y = 0;
-  srcR.w = spriteSecondaryWeapons->w / NR_SECONDARY_WEAPONS;
-  srcR.h = spriteSecondaryWeapons->h;
+  srcR.w = spriteSecondaryWeaponsR.w / NR_SECONDARY_WEAPONS;
+  srcR.h = spriteSecondaryWeaponsR.h;
   destR.x = x;
   destR.y = 25;
-  destR.w = spriteSecondaryWeapons->w / NR_SECONDARY_WEAPONS;
+  destR.w = spriteSecondaryWeaponsR.w / NR_SECONDARY_WEAPONS;
   x += destR.w + 5;
-  destR.h = spriteSecondaryWeapons->h;
-  SDL_BlitSurface( spriteSecondaryWeapons, &srcR, screen, &destR );
+  destR.h = spriteSecondaryWeaponsR.h;
+  //SDL_BlitSurface( spriteSecondaryWeapons, &srcR, screen, &destR );
+  SDL_RenderCopy(screen, spriteSecondaryWeapons, &srcR, &destR );
   
   // draw active special and amount of it
   if ( activeSpecial != SPECIAL_NONE ) {
-    int pixPerSpecial = spriteSpecials->w / (NR_SPECIALS - 1);
+    int pixPerSpecial = spriteSpecialsR.w / (NR_SPECIALS - 1);
     srcR.y = 0;
     srcR.w = pixPerSpecial;
-    srcR.h = spriteSpecials->h;
+    srcR.h = spriteSpecialsR.h;
     srcR.x = (activeSpecial - SPECIAL_NUKE) * pixPerSpecial;
     destR.x = x;
     destR.y = 25;
     destR.w = pixPerSpecial;
     x += pixPerSpecial + 2;
-    destR.h = spriteSpecials->h;
-    SDL_BlitSurface( spriteSpecials, &srcR, screen, &destR );
+    destR.h = spriteSpecialsR.h;
+    //SDL_BlitSurface( spriteSpecials, &srcR, screen, &destR );
+    SDL_RenderCopy(screen, spriteSpecials, &srcR, &destR );
     int digitCnt = 1;
     int i=1;
     while ( specialsAvailability[ activeSpecial ] >= i*10 ) {
@@ -282,21 +295,22 @@ void Racer::drawStats( SDL_Surface *screen ) {
   if ( !onePlayerGame ) {
     // draw Icon
     switch (playerNr) {
-    case 0: indent = 10 + spriteHPStat->w; break;
-    case 1: indent = screen->w - (20 + spriteHPStat->w + spriteFighterIcon->w); break;
+    case 0: indent = 10 + spriteHPStatR.w; break;
+    case 1: indent = SCREEN_WIDTH - (20 + spriteHPStatR.w + spriteFighterIconR.w); break;
     default: break;
     }
     destR.x = indent;
-    destR.w = spriteFighterIcon->w;
+    destR.w = spriteFighterIconR.w;
     destR.y = 2;
-    destR.h = spriteFighterIcon->h;
-    SDL_BlitSurface( spriteFighterIcon, 0, screen, &destR );
+    destR.h = spriteFighterIconR.h;
+    //SDL_BlitSurface( spriteFighterIcon, 0, screen, &destR );
+    SDL_RenderCopy(screen, spriteFighterIcon, 0, &destR );
   }
 
   // draw shields and damage
   switch (playerNr) {
   case 0: indent = 5; break;
-  case 1: indent = screen->w - (15 + spriteHPStat->w); break;
+  case 1: indent = SCREEN_WIDTH - (15 + spriteHPStatR.w); break;
   default: break;
   }
 
@@ -304,41 +318,44 @@ void Racer::drawStats( SDL_Surface *screen ) {
   srcR.x = 0;
   srcR.y = 0;
   srcR.w = lroundf(damage * pixPerHP);
-  srcR.h = spriteHPStat->h;
+  srcR.h = spriteHPStatR.h;
   destR.x = indent;
   destR.w = srcR.w;
   destR.y = 5;
-  destR.h = spriteHPStat->h;
-  SDL_BlitSurface( spriteHPStat, &srcR, screen, &destR );
+  destR.h = spriteHPStatR.h;
+  //SDL_BlitSurface( spriteHPStat, &srcR, screen, &destR );
+  SDL_RenderCopy(screen, spriteHPStat, &srcR, &destR );
   // draw shield
   destR.x = indent + srcR.w;
-  srcR.x = spriteHPStat->w / 2;
+  srcR.x = spriteHPStatR.w / 2;
   srcR.w = lroundf(shield * pixPerHP);
   destR.w = srcR.w;
-  destR.h = spriteHPStat->h;
-  SDL_BlitSurface( spriteHPStat, &srcR, screen, &destR );
+  destR.h = spriteHPStatR.h;
+  //SDL_BlitSurface( spriteHPStat, &srcR, screen, &destR );
+  SDL_RenderCopy(screen, spriteHPStat, &srcR, &destR );
 }
 
 
-void Racer::drawShadow( SDL_Surface *screen ) {
+void Racer::drawShadow( SDL_Renderer *screen ) {
   SDL_Rect destR;
-  destR.x = lroundf(pos.getX()) - (spriteShadow->w / 2) - 10;
-  destR.y = lroundf(pos.getY()) - (spriteShadow->h / 2) + 10;
-  destR.w = spriteShadow->w;
-  destR.h = spriteShadow->h;
-  SDL_BlitSurface( spriteShadow, 0, screen, &destR );
+  destR.x = lroundf(pos.getX()) - (spriteShadowR.w / 2) - 10;
+  destR.y = lroundf(pos.getY()) - (spriteShadowR.h / 2) + 10;
+  destR.w = spriteShadowR.w;
+  destR.h = spriteShadowR.h;
+  //SDL_BlitSurface( spriteShadow, 0, screen, &destR );
+  SDL_RenderCopy(screen, spriteShadow, 0, &destR );
 }
 
 
-void Racer::drawRacer( SDL_Surface *screen ) {
+void Racer::drawRacer( SDL_Renderer *screen ) {
 
   SDL_Rect srcR;
   SDL_Rect destR;
 
-  destR.x = lroundf(pos.getX()) - (spriteRacerBase->w / (2*RACER_IMAGE_CNT));
-  destR.y = lroundf(pos.getY()) - (spriteRacerBase->h / 2);
-  destR.w = spriteRacerBase->w / RACER_IMAGE_CNT;
-  destR.h = spriteRacerBase->h;
+  destR.x = lroundf(pos.getX()) - (spriteRacerBaseR.w / (2*RACER_IMAGE_CNT));
+  destR.y = lroundf(pos.getY()) - (spriteRacerBaseR.h / 2);
+  destR.w = spriteRacerBaseR.w / RACER_IMAGE_CNT;
+  destR.h = spriteRacerBaseR.h;
   
   int idx = 0; // normal pos
   if ( !left && !right && !thrust && !backwards ) idx = 0; //stop
@@ -350,12 +367,13 @@ void Racer::drawRacer( SDL_Surface *screen ) {
   else if ( !left && right && thrust && !backwards ) idx = 6; // right-forward
   else if ( left && !right && !thrust && backwards ) idx = 7; // left-backward
   else if ( !left && right && !thrust && backwards ) idx = 8; // right-backward
-  srcR.x = idx * (spriteRacerBase->w / RACER_IMAGE_CNT);
+  srcR.x = idx * (spriteRacerBaseR.w / RACER_IMAGE_CNT);
   srcR.y = 0;
-  srcR.w = (spriteRacerBase->w / RACER_IMAGE_CNT);
-  srcR.h = spriteRacerBase->h;
+  srcR.w = (spriteRacerBaseR.w / RACER_IMAGE_CNT);
+  srcR.h = spriteRacerBaseR.h;
   
-  SDL_BlitSurface( spriteRacerBase, &srcR, screen, &destR );
+  //SDL_BlitSurface( spriteRacerBase, &srcR, screen, &destR );
+  SDL_RenderCopy(screen, spriteRacerBase, &srcR, &destR );
 
   if ( shieldDamageActive ) {
     int shieldGlowTimeLeft = shieldDamageEndTime - SDL_GetTicks();
@@ -367,9 +385,10 @@ void Racer::drawRacer( SDL_Surface *screen ) {
   }
 
   if ( deflectorActive ) {
-    drawRectDeflector.x = lroundf(pos.getX()) - spriteDeflector->w / 2;
-    drawRectDeflector.y = lroundf(pos.getY()) - spriteDeflector->h / 2;
-    SDL_BlitSurface( spriteDeflector, 0, screen, &drawRectDeflector );
+    drawRectDeflector.x = lroundf(pos.getX()) - spriteDeflectorR.w / 2;
+    drawRectDeflector.y = lroundf(pos.getY()) - spriteDeflectorR.h / 2;
+    //SDL_BlitSurface( spriteDeflector, 0, screen, &drawRectDeflector );
+    SDL_RenderCopy(screen, spriteDeflector, 0, &drawRectDeflector );
   }
 }
 
@@ -422,7 +441,7 @@ void Racer::shootPrimary() {
 	if ( (SDL_GetTicks() - RACER_COOLDOWN_SHOT_NORMAL) > timeLastShotPrimary ) {
 	  Shot *shot = 
 	    new Shot( SHOT_NORMAL, playerNr,
-		      pos + Vector2D(0, -spriteRacerBase->h / 2),
+		      pos + Vector2D(0, -spriteRacerBaseR.h / 2),
 		      -90 + (rand() % SPREAD_ANGLE_SHOT_NORMAL) -
 		      SPREAD_ANGLE_SHOT_NORMAL / 2 );
 	  shots->addShot( shot );
@@ -436,7 +455,7 @@ void Racer::shootPrimary() {
 	if ( SDL_GetTicks() - RACER_COOLDOWN_SHOT_NORMAL_HEAVY > timeLastShotPrimary ) {
 	  Shot *shot = 
 	    new Shot( SHOT_NORMAL_HEAVY, playerNr,
-		      pos + Vector2D(0, -spriteRacerBase->h / 2), -90 );
+		      pos + Vector2D(0, -spriteRacerBaseR.h / 2), -90 );
 	  shots->addShot( shot );
 	  mixer.playSample( sndShotPrimary, 0 );
 	  timeLastShotPrimary = SDL_GetTicks();
@@ -477,7 +496,7 @@ void Racer::shootPrimary() {
 	  Shot *shot1 = 
 	    new Shot( SHOT_TRIPLE, playerNr, pos + Vector2D(-8, -2), -100 );
 	  Shot *shot2 = 
-	    new Shot( SHOT_TRIPLE, playerNr, pos + Vector2D(0, -spriteRacerBase->h / 2), -90 );
+	    new Shot( SHOT_TRIPLE, playerNr, pos + Vector2D(0, -spriteRacerBaseR.h / 2), -90 );
 	  Shot *shot3 = 
 	    new Shot( SHOT_TRIPLE, playerNr, pos + Vector2D(8, -2), -80 );
 	  shots->addShot(shot1);
@@ -495,7 +514,7 @@ void Racer::shootPrimary() {
 	if ( (SDL_GetTicks() - RACER_COOLDOWN_SHOT_HF_NORMAL) > timeLastShotPrimary ) {
 	  Shot *shot = 
 	    new Shot( SHOT_HF_NORMAL, playerNr,
-		      pos + Vector2D(0, -spriteRacerBase->h / 2), -90 );
+		      pos + Vector2D(0, -spriteRacerBaseR.h / 2), -90 );
 	  shots->addShot( shot );
 	  mixer.playSample( sndShotPrimary, 0 );
 	  timeLastShotPrimary = SDL_GetTicks();
@@ -520,7 +539,7 @@ void Racer::shootPrimary() {
 	  Shot *shot = new Shot( SHOT_HF_TRIPLE, playerNr, pos + Vector2D(-12, -12), -103 );
 	  shots->addShot( shot );
 	  shot = new Shot( SHOT_HF_TRIPLE, playerNr, 
-			   pos + Vector2D(0, -spriteRacerBase->h / 2), -90 );
+			   pos + Vector2D(0, -spriteRacerBaseR.h / 2), -90 );
 	  shots->addShot( shot );
 	  shot = new Shot( SHOT_HF_TRIPLE, playerNr, pos + Vector2D(12, -12), -77 );
 	  shots->addShot( shot );
@@ -553,7 +572,7 @@ void Racer::shootPrimary() {
 	  shot = new Shot( SHOT_HF_QUINTO, playerNr, pos + Vector2D(-12, -12), -100 );
 	  shots->addShot( shot );
 	  shot = new Shot( SHOT_HF_QUINTO, playerNr, 
-			   pos + Vector2D(0, -spriteRacerBase->h / 2), -90 );
+			   pos + Vector2D(0, -spriteRacerBaseR.h / 2), -90 );
 	  shots->addShot( shot );
 	  shot = new Shot( SHOT_HF_QUINTO, playerNr, pos + Vector2D(12, -12), -80 );
 	  shots->addShot( shot );
@@ -668,10 +687,10 @@ void Racer::shootSecondary() {
 	  
 	  Shot *shot1 = 
 	    new Shot( SHOT_MACHINE_GUN, playerNr, 
-		      pos + Vector2D(-3, -spriteRacerBase->h/2), angle1 );
+		      pos + Vector2D(-3, -spriteRacerBaseR.h/2), angle1 );
 	  Shot *shot2 = 
 	    new Shot( SHOT_MACHINE_GUN, playerNr, 
-		      pos + Vector2D(+3, -spriteRacerBase->h/2), angle2 );
+		      pos + Vector2D(+3, -spriteRacerBaseR.h/2), angle2 );
 	  shots->addShot(shot1);
 	  shots->addShot(shot2);
 	  mixer.playSample( sndShotSecondary, 0 );
@@ -803,11 +822,11 @@ bool Racer::collidesWith( const Circle &circle ) {
 }
 
 bool Racer::collidesWithAsCircle( const Circle &circle ) {
-  return ( (circle.getRadius() + (spriteRacerBase->w / RACER_IMAGE_CNT)/2) > circle.getCenter().distanceTo( pos ) );
+  return ( (circle.getRadius() + (spriteRacerBaseR.w / RACER_IMAGE_CNT)/2) > circle.getCenter().distanceTo( pos ) );
 }
 
 bool Racer::collidesWithAsCircle( BoundingBox *box ) {
-  return ( box->overlaps( Circle( pos, spriteRacerBase->h >> 1 ) ) );
+  return ( box->overlaps( Circle( pos, spriteRacerBaseR.h >> 1 ) ) );
 }
 
 BoundingBox *Racer::getBoundingBox() {
@@ -903,8 +922,8 @@ void Racer::setPos( const Vector2D &newPos ) {
 
 
 void Racer::updateBoundingBox() {
-  boundingBox->moveUpperBound( lroundf(pos.getY() - spriteRacerBase->h * 0.45) );
-  boundingBox->moveLeftBound( lroundf(pos.getX() - (spriteRacerBase->w / RACER_IMAGE_CNT) * 0.45) );
+  boundingBox->moveUpperBound( lroundf(pos.getY() - spriteRacerBaseR.h * 0.45) );
+  boundingBox->moveLeftBound( lroundf(pos.getX() - (spriteRacerBaseR.w / RACER_IMAGE_CNT) * 0.45) );
 }
 
 

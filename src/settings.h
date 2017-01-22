@@ -45,10 +45,10 @@ enum SettingsChoices { SC_UP1 = 0, SC_DOWN1, SC_LEFT1, SC_RIGHT1,
 const int NR_SETTINGS_CHOICES = 19;
 
 
-typedef std::map< PlayerEvent, SDLKey > PlayerEventKeys;
-typedef std::map< SDLKey, PlayerEvent > PlayerKeys;
+typedef std::map< PlayerEvent, SDL_Keycode > PlayerEventKeys;
+typedef std::map< SDL_Keycode, PlayerEvent > PlayerKeys;
 typedef std::map< PlayerEvent, std::string > PlayerEventName;
-typedef std::map< std::string, SDLKey > DefaultSettings;
+typedef std::map< std::string, SDL_Keycode > DefaultSettings;
 
 class Settings;
 
@@ -60,15 +60,17 @@ class Settings {
   Settings();
   ~Settings();
   
-  void settingsDialog(SDL_Surface *screen);
+  void settingsDialog(SDL_Renderer *screen);
   const PlayerKeys getPlayerKeys(unsigned int player) const;
 
   private:
 
-  SDL_Surface *introSprite;
-  SDL_Surface *activeChoiceSprite;
-  SDL_Surface *bluePlain;
-  SDL_Surface *whitePlain;
+  SDL_Texture *introSprite;
+  SDL_Rect introSpriteR;
+  SDL_Texture *activeChoiceSprite;
+  SDL_Rect activeChoiceSpriteR;
+  SDL_Texture *bluePlain;
+  SDL_Texture *whitePlain;
   SettingsChoices actChoice;
   bool wasLeftColumn;
   Options *opfile;
@@ -78,18 +80,18 @@ class Settings {
   Font *fontKey;
   Font *fontHighlighted;
   std::vector< PlayerEventKeys > playerKeys;
-  std::map< SDLKey, std::string > keyName;
+  std::map< SDL_Keycode, std::string > keyName;
   PlayerEventName playerEventNames;
   DefaultSettings defaultSettings;
   void getNewKeyFromUser();
   void loadDefaultSettings();
   void loadSettings();
   void saveSettings();
-  void draw( SDL_Surface *screen, bool getNewKey=false );
-  void showSpecialKeys( SDL_Surface *screen );
-  void showSettings( SDL_Surface *screen, bool getNewKey );
-  void showMenu( SDL_Surface *screen );
-  void changeCurrentSettings(SDL_Surface *screen, int player);
+  void draw( SDL_Renderer *screen, bool getNewKey=false );
+  void showSpecialKeys( SDL_Renderer *screen );
+  void showSettings( SDL_Renderer *screen, bool getNewKey );
+  void showMenu( SDL_Renderer *screen );
+  void changeCurrentSettings(SDL_Renderer *screen, int player);
   void setKeyNames();
 };
 

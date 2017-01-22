@@ -34,7 +34,7 @@ Video::~Video(){
   // kill something
 }
 
-SDL_Surface *Video::init(){
+SDL_Renderer *Video::init() {
   // --------------------------------------------------
   // SDL initialisation
   // -----------------------------------------------------
@@ -43,35 +43,44 @@ SDL_Surface *Video::init(){
     printf("Couldn't initialize SDL video subsystem: %s\n", SDL_GetError());
     exit(1);
   }
-  screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_DOUBLEBUF /* | SDL_FULLSCREEN */ );
+  
+  SDL_Window *win = NULL;
+  win = SDL_CreateWindow("AlienBlaster", SDL_WINDOWPOS_CENTERED,
+    SDL_WINDOWPOS_CENTERED,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT, 0);
+  screen = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+
   if (!screen) {
-    printf("Couldn't set %dx%d, %dbit video mode: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
+    printf("Couldn't create renderer!!!\n");
     exit(2);
   }
   
-  SDL_WM_SetCaption("AlienBlaster", "AlienBlaster");
-  SDL_WM_SetIcon(SDL_LoadBMP( FN_ALIENBLASTER_ICON.c_str() ), NULL);
-  SDL_ShowCursor(SDL_DISABLE);
-
   return screen;
 }
 
 
 void Video::clearScreen() {
-  // clear the screen
-  SDL_Rect r;
-  r.x = 0;
-  r.y = 0;
-  r.w = screen->w;
-  r.h = screen->h;
-  SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 0) );
+    SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+    SDL_RenderClear(screen);
+    SDL_RenderPresent(screen);
 }
 
 void Video::toggleFullscreen() {
+
+#if 0
   if ( fullscreen ) {
     screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_DOUBLEBUF );
   } else {
     screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_DOUBLEBUF | SDL_FULLSCREEN );
   }
   fullscreen = !fullscreen;
+#endif
+
+#if SDL2
+SDL_SetWindowFullscreen(SDL_Window* window,
+                            Uint32      flags)
+flags: SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP or 0
+#endif
+  
 }

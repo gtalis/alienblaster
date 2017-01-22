@@ -29,12 +29,13 @@ extern Video *videoserver;
 class Video {
 
 private:
-  SDL_Surface *screen;
+  //SDL_Surface *screen;
+  SDL_Renderer *screen;
 
 public:
   Video();
   ~Video();
-  SDL_Surface *init();
+  SDL_Renderer *init();
 
   bool fullscreen;
   

@@ -36,13 +36,19 @@ const int NR_DIFFICULTY_CHOICES = 5;
 
 class SetDifficulty {
   private:
-  SDL_Surface *screen;
-  SDL_Surface *introSprite;
-  SDL_Surface *activeChoiceSprite;
-  SDL_Surface *lightFighterIcon1;
-  SDL_Surface *lightFighterIcon2;
-  SDL_Surface *heavyFighterIcon1;
-  SDL_Surface *heavyFighterIcon2;
+  SDL_Renderer *screen;
+  SDL_Texture *introSprite;
+  SDL_Rect introSpriteR;
+  SDL_Texture *activeChoiceSprite;
+  SDL_Rect activeChoiceSpriteR;
+  SDL_Texture *lightFighterIcon1;
+  SDL_Rect lightFighterIcon1R;
+  SDL_Texture *lightFighterIcon2;
+  SDL_Rect lightFighterIcon2R;
+  SDL_Texture *heavyFighterIcon1;
+  SDL_Rect heavyFighterIcon1R;
+  SDL_Texture *heavyFighterIcon2;
+  SDL_Rect heavyFighterIcon2R;
   Font *font;
   Font *fontHighlighted;
   
@@ -56,7 +62,7 @@ class SetDifficulty {
   int choose;
 
   public:
-  SetDifficulty( SDL_Surface *scr );
+  SetDifficulty( SDL_Renderer *scr );
   ~SetDifficulty();
   void run( GameStates &gameState, bool onePlayerGame );
   bool getPlayerOneLightFighter();

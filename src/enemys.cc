@@ -208,23 +208,28 @@ void Enemys::generateEnemys( int dT ) {
       }
     case TANK:
       {
-// 	SDL_Surface *spriteTank = surfaceDB.loadSurface( FN_ENEMY_TANK );
-// 	SDL_Surface *spriteTankWreck = surfaceDB.loadSurface( FN_WRECK_TANK );
+// 	SDL_Renderer *spriteTank = surfaceDB.loadSurface( FN_ENEMY_TANK );
+// 	SDL_Renderer *spriteTankWreck = surfaceDB.loadSurface( FN_WRECK_TANK );
 	string fn1, fn2;
 	levelConf->getStr( LVL_ENEMY_TANK, fn1 );
 	levelConf->getStr( LVL_WRECK_TANK, fn2 );
-	SDL_Surface *spriteTank = surfaceDB.loadSurface( fn1 );
-	SDL_Surface *spriteTankWreck = surfaceDB.loadSurface( fn2 );
-	int halfWidthTank = spriteTank->w / 2;
-	int halfHeightTank = spriteTank->h / 2;
-	int halfWidthTankWreck = spriteTankWreck->w / 2;
-	int halfHeightTankWreck = spriteTankWreck->h / 2;
+	SDL_Texture *spriteTank = surfaceDB.loadSurface( fn1 );
+  SDL_Rect spriteTankR;
+  SDL_QueryTexture( spriteTank, NULL, NULL, &spriteTankR.w, &spriteTankR.h);
+	SDL_Texture *spriteTankWreck = surfaceDB.loadSurface( fn2 );
+  SDL_Rect spriteTankWreckR;
+  SDL_QueryTexture( spriteTankWreck, NULL, NULL, &spriteTankWreckR.w, &spriteTankWreckR.h);
+
+	int halfWidthTank = spriteTankR.w / 2;
+	int halfHeightTank = spriteTankR.h / 2;
+	int halfWidthTankWreck = spriteTankWreckR.w / 2;
+	int halfHeightTankWreck = spriteTankWreckR.h / 2;
 
 	int xPos;
 	
 	for ( int i = 0; i < 10; i++ ) {
 	  bool collides = false;
-	  xPos =  halfWidthTank + rand() % (SCREEN_WIDTH - spriteTank->w);
+	  xPos =  halfWidthTank + rand() % (SCREEN_WIDTH - spriteTankR.w);
 	  // check if collides with another tank
 	  for ( unsigned int t = 0; t < enemys.size(); t++ ) {
 	    if ( enemys[ t ]->getType() == TANK ) {
@@ -338,28 +343,28 @@ void Enemys::deleteExpiredEnemys() {
   }
 }
 
-void Enemys::drawGroundEnemys(SDL_Surface *screen) {
+void Enemys::drawGroundEnemys(SDL_Renderer *screen) {
   vector<Enemy *>::iterator i;
   for (i = enemys.begin(); i != enemys.end(); ++i) {
     (*i)->drawGroundEnemy(screen);
   }
 }
 
-void Enemys::drawAirEnemys(SDL_Surface *screen) {
+void Enemys::drawAirEnemys(SDL_Renderer *screen) {
   vector<Enemy *>::iterator i;
   for (i = enemys.begin(); i != enemys.end(); ++i) {
     (*i)->drawAirEnemy(screen);
   }
 }
   
-void Enemys::drawShadows(SDL_Surface *screen) {
+void Enemys::drawShadows(SDL_Renderer *screen) {
   vector<Enemy *>::iterator i;
   for (i = enemys.begin(); i != enemys.end(); ++i) {
     (*i)->drawShadow(screen);
   }
 }
 
-void Enemys::drawBossStats( SDL_Surface *screen ) {
+void Enemys::drawBossStats( SDL_Renderer *screen ) {
   for ( unsigned int i = 0; i < enemys.size(); i++ ) {
     if ( enemys[ i ]->getType() >= NR_ENEMY_TYPES_NORMAL ) {
       enemys[ i ]->drawStats( screen );
@@ -367,7 +372,7 @@ void Enemys::drawBossStats( SDL_Surface *screen ) {
   }
 }
 
-void Enemys::drawAllStats( SDL_Surface *screen ) {
+void Enemys::drawAllStats( SDL_Renderer *screen ) {
   for ( unsigned int i = 0; i < enemys.size(); i++ ) {
     enemys[ i ]->drawStats( screen );
   }

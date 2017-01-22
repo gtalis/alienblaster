@@ -46,14 +46,19 @@ enum GameStates { GS_QUIT, GS_SCREENSHOTS, GS_INTRO, GS_SET_DIFFICULTY,
    game objects and their dependencies. */
 class Game {
   // Video system
-  SDL_Surface *screen;
+  SDL_Renderer *screen;
 
-  SDL_Surface *pauseSprite;
-  SDL_Surface *youLoseSprite;
-  SDL_Surface *youWinSprite;
-  SDL_Surface *gameOverSprite;
-  SDL_Surface *nukeEffectSurface;
-  SDL_Surface *hud;
+  SDL_Texture *pauseSprite;
+  SDL_Rect pauseSpriteR;
+  SDL_Texture *youLoseSprite;
+  SDL_Rect youLoseSpriteR;
+  SDL_Texture *youWinSprite;
+  SDL_Rect youWinSpriteR;
+  SDL_Texture *gameOverSprite;
+  SDL_Rect gameOverSpriteR;
+  SDL_Texture *nukeEffectSurface;
+  SDL_Rect nukeEffectSurfaceR;
+  SDL_Texture *hud;
 
   // Time system
   Font *fontTime;
@@ -90,6 +95,9 @@ class Game {
   
   Sonic *sonic1;
   Sonic *sonic2;
+
+  int screen_w;
+  int screen_h;
 
   public:
   // for access from main()

@@ -36,9 +36,11 @@ const int NR_INTRO_CHOICES = 6;
 
 class Intro {
   private:
-  SDL_Surface *screen;
-  SDL_Surface *introSprite;
-  SDL_Surface *activeChoiceSprite;
+  SDL_Renderer *screen;
+  SDL_Texture *introSprite;
+  SDL_Rect introSpriteR;
+  SDL_Texture *activeChoiceSprite;
+  SDL_Rect activeChoiceSpriteR;
   Font *font;
   Font *fontHighlighted;
   Infoscreen *infoscreen;
@@ -50,11 +52,11 @@ class Intro {
   int confirm;
 
   public:
-  Intro( SDL_Surface *scr );
+  Intro( SDL_Renderer *scr );
   ~Intro();
   void run( GameStates &gameState );
   void showScreenshots();
-  bool blendImages( SDL_Surface *screen, SDL_Surface *surf0, SDL_Rect *r1, SDL_Surface *surf1, SDL_Rect *r2, int sps );
+  bool blendImages( SDL_Renderer *screen, SDL_Surface *surf0, SDL_Rect *r1, SDL_Surface *surf1, SDL_Rect *r2, int sps );
 
   private:
   void handleEvents( GameStates &gameState );

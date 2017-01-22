@@ -40,13 +40,18 @@ class ShieldGlow;
 /* The Racer is the vehicle, that the player can steer. */
 class Racer {
 
-  SDL_Surface *spriteRacerBase;
+  SDL_Texture *spriteRacerBase;
+  SDL_Rect spriteRacerBaseR;
   SDL_Rect drawRectBase;
-  SDL_Surface *spriteShadow;
-  SDL_Surface *spriteDeflector;
+  SDL_Texture *spriteShadow;
+  SDL_Rect spriteShadowR;
+  SDL_Texture *spriteDeflector;
+  SDL_Rect spriteDeflectorR;
   SDL_Rect drawRectDeflector;
-  SDL_Surface *spriteHPStat;
-  SDL_Surface *spriteFighterIcon;
+  SDL_Texture *spriteHPStat;
+  SDL_Rect spriteHPStatR;
+  SDL_Texture *spriteFighterIcon;
+  SDL_Rect spriteFighterIconR;
 
   // for collision with other racers or shots. 
   // A rectangle with racersize * 0.9 is used.
@@ -57,8 +62,10 @@ class Racer {
 
   Font *font; // font used for displaying ammo and lapcnt
   int fontSize;
-  SDL_Surface *spriteSecondaryWeapons;
-  SDL_Surface *spriteSpecials;
+  SDL_Texture *spriteSecondaryWeapons;
+  SDL_Rect spriteSecondaryWeaponsR;
+  SDL_Texture *spriteSpecials;
+  SDL_Rect spriteSpecialsR;
 
   int sndShotPrimary;
   int sndShotSecondary;
@@ -155,9 +162,9 @@ class Racer {
   // switch special, if the activespecial is out of ammo
   void specialKeyUp();
   
-  void drawRacer( SDL_Surface *screen );
-  void drawShadow( SDL_Surface *screen );
-  void drawStats( SDL_Surface *screen );
+  void drawRacer( SDL_Renderer *screen );
+  void drawShadow( SDL_Renderer *screen );
+  void drawStats( SDL_Renderer *screen );
 
   // collision system
   // return if the line between the two points collides with the boundingBox
