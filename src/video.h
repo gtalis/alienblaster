@@ -31,6 +31,7 @@ class Video {
 private:
   //SDL_Surface *screen;
   SDL_Renderer *screen;
+  SDL_Window *game_window;
 
 public:
   Video();

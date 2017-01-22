@@ -44,12 +44,12 @@ SDL_Renderer *Video::init() {
     exit(1);
   }
   
-  SDL_Window *win = NULL;
-  win = SDL_CreateWindow("AlienBlaster", SDL_WINDOWPOS_CENTERED,
+  game_window = NULL;
+  game_window = SDL_CreateWindow("AlienBlaster", SDL_WINDOWPOS_CENTERED,
     SDL_WINDOWPOS_CENTERED,
     SCREEN_WIDTH,
     SCREEN_HEIGHT, 0);
-  screen = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+  screen = SDL_CreateRenderer(game_window, -1, SDL_RENDERER_ACCELERATED);
 
   if (!screen) {
     printf("Couldn't create renderer!!!\n");
@@ -68,19 +68,10 @@ void Video::clearScreen() {
 
 void Video::toggleFullscreen() {
 
-#if 0
-  if ( fullscreen ) {
-    screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_DOUBLEBUF );
-  } else {
-    screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_DOUBLEBUF | SDL_FULLSCREEN );
-  }
-  fullscreen = !fullscreen;
-#endif
+  if (fullscreen)
+    SDL_SetWindowFullscreen(game_window, 0);
+  else
+    SDL_SetWindowFullscreen(game_window, SDL_WINDOW_FULLSCREEN);
 
-#if SDL2
-SDL_SetWindowFullscreen(SDL_Window* window,
-                            Uint32      flags)
-flags: SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP or 0
-#endif
-  
+  fullscreen = !fullscreen;
 }
